@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Asistencia SaaS</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --danger: #ef4444;
+      --success: #10b981;
+      --border: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+
+    body {
+      background: linear-gradient(135deg, #dbeafe 0%, #f1f5f9 60%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card-bg);
+      padding: 2.5rem 2rem;
+      border-radius: 1.25rem;
+      box-shadow: 0 20px 40px -8px rgba(37,99,235,0.12), 0 4px 12px rgba(0,0,0,0.06);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* ── Logo / Header ── */
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: var(--primary);
+      border-radius: 0.6rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 22px; height: 22px; fill: white; }
+    .logo-text { font-size: 1.15rem; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
+
+    .card-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Formulario ── */
+    .form-group { margin-bottom: 1.25rem; }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.45rem;
+      color: var(--text-muted);
+    }
+
+    .pin-wrapper { position: relative; }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 0.85rem 2.8rem 0.85rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 0.65rem;
+      font-size: 1.4rem;
+      letter-spacing: 0.35em;
+      text-align: center;
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="password"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+      background: #fff;
+    }
+    input[type="password"]::placeholder { letter-spacing: 0.25em; color: #cbd5e1; font-size: 1rem; }
+
+    /* Ojo para mostrar/ocultar PIN */
+    .toggle-pin {
+      position: absolute;
+      right: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+    }
+    .toggle-pin svg { width: 18px; height: 18px; }
+
+    /* ── Botón principal ── */
+    .btn-primary {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0.65rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+      letter-spacing: 0.02em;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-dark);
+      box-shadow: 0 6px 16px rgba(37,99,235,0.35);
+    }
+    .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+    .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
+
+    /* Spinner dentro del botón */
+    .btn-primary .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Mensajes ── */
+    .msg {
+      padding: 0.75rem 1rem;
+      border-radius: 0.6rem;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      display: none;
+      line-height: 1.4;
+    }
+    .msg.error   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .msg.warning { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+    /* Intentos fallidos */
+    .attempts-bar {
+      display: flex;
+      gap: 0.35rem;
+      justify-content: center;
+      margin-top: 0.75rem;
+      height: 5px;
+    }
+    .attempt-dot {
+      flex: 1;
+      max-width: 50px;
+      border-radius: 99px;
+      background: #e2e8f0;
+      transition: background 0.3s;
+    }
+    .attempt-dot.used { background: var(--danger); }
+
+    /* ── Dashboard ── */
+    .dashboard { display: none; }
+
+    .user-card {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 1rem 1.25rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .user-card .company {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #3b82f6;
+      margin-bottom: 0.2rem;
+    }
+    .user-card .name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .user-card .role {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--success);
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 0.4rem 0.85rem;
+      border-radius: 99px;
+      margin-bottom: 1.5rem;
+    }
+    .status-badge span { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 1.8s infinite; display: inline-block; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+    .btn-logout {
+      width: 100%;
+      padding: 0.75rem;
+      background: transparent;
+      color: var(--danger);
+      border: 1.5px solid var(--danger);
+      border-radius: 0.65rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-logout:hover { background: #fef2f2; }
+
+    /* ── Bloqueado ── */
+    .lockout { display: none; text-align: center; }
+    .lockout-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .lockout h3 { color: var(--danger); margin-bottom: 0.5rem; }
+    .lockout p { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem; }
+    .countdown { font-size: 1.5rem; font-weight: 700; color: var(--danger); }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- ════════════════ VISTA: LOGIN ════════════════ -->
+  <div id="view-login">
+
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </div>
+      <span class="logo-text">AsistenciaPWA</span>
+    </div>
+    <p class="card-subtitle">Ingresa tu PIN para marcar asistencia</p>
+
+    <div id="error-box" class="msg error"></div>
+    <div id="warn-box"  class="msg warning"></div>
+
+    <div class="form-group">
+      <label for="pin">PIN de Empleado</label>
+      <div class="pin-wrapper">
+        <input type="password" id="pin" inputmode="numeric"
+               placeholder="· · · ·" maxlength="8" required autofocus autocomplete="off">
+        <button type="button" class="toggle-pin" id="toggle-pin" aria-label="Mostrar PIN">
+          <!-- ojo abierto -->
+          <svg id="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <!-- ojo cerrado (oculto por defecto) -->
+          <svg id="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button type="button" id="btn-submit" class="btn-primary">Ingresar</button>
+
+    <!-- Indicador de intentos -->
+    <div class="attempts-bar" id="attempts-bar">
+      <div class="attempt-dot" id="dot-1"></div>
+      <div class="attempt-dot" id="dot-2"></div>
+      <div class="attempt-dot" id="dot-3"></div>
+      <div class="attempt-dot" id="dot-4"></div>
+      <div class="attempt-dot" id="dot-5"></div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════ VISTA: BLOQUEADO ════════════════ -->
+  <div id="view-lockout" class="lockout">
+    <div class="lockout-icon">🔒</div>
+    <h3>Acceso bloqueado</h3>
+    <p>Demasiados intentos fallidos. Espera antes de volver a intentarlo.</p>
+    <div class="countdown" id="countdown-timer">05:00</div>
+    <p style="margin-top:0.5rem; font-size:0.78rem;">El bloqueo se levantará automáticamente</p>
+  </div>
+
+  <!-- ════════════════ VISTA: DASHBOARD ════════════════ -->
+  <div id="view-dashboard" class="dashboard">
+
+    <div class="logo" style="margin-bottom:1.5rem">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </div>
+      <span class="logo-text">AsistenciaPWA</span>
+    </div>
+
+    <div class="user-card">
+      <div class="company" id="user-empresa">—</div>
+      <div class="name"    id="user-nombre">Cargando...</div>
+      <div class="role"    id="user-cargo"></div>
+    </div>
+
+    <div style="text-align:center">
+      <span class="status-badge">
+        <span></span> Sesión activa
+      </span>
+    </div>
+
+    <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; margin-bottom:1.5rem;">
+      Listo para integrar geolocalización y botones de marcación.
+    </p>
+
+    <button id="btn-logout" class="btn-logout">Cerrar sesión</button>
+  </div>
+
+</div><!-- /card -->
+
+<script>
+  // ─────────────────────────────────────────
+  //  CONFIGURACIÓN
+  // ─────────────────────────────────────────
+  const API_URL = "https://script.google.com/macros/s/AKfycbzF4VXoD2rU0iBjb5If39ZsT2GnGdaQawgATS3k8x7xqq2XvzZ7hOz-enu6l0m7IVvcnw/exec";
+
+  const MAX_INTENTOS   = 5;       // bloqueo tras N fallos
+  const BLOQUEO_SEG    = 5 * 60;  // duración del bloqueo en segundos (5 min)
+  const STORAGE_KEY    = "sesion_asistencia";
+  const LOCKOUT_KEY    = "lockout_asistencia";
+
+  // ─────────────────────────────────────────
+  //  REFERENCIAS DOM
+  // ─────────────────────────────────────────
+  const viewLogin     = document.getElementById("view-login");
+  const viewDashboard = document.getElementById("view-dashboard");
+  const viewLockout   = document.getElementById("view-lockout");
+
+  const pinInput  = document.getElementById("pin");
+  const btnSubmit = document.getElementById("btn-submit");
+  const errorBox  = document.getElementById("error-box");
+  const warnBox   = document.getElementById("warn-box");
+
+  let countdownInterval = null;
+
+  // ─────────────────────────────────────────
+  //  INICIO: verificar sesión o bloqueo
+  // ─────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", () => {
+    // ¿Existe sesión guardada?
+    const sesion = safeParseJSON(localStorage.getItem(STORAGE_KEY));
+    if (sesion) { mostrarDashboard(sesion); return; }
+
+    // ¿Está bloqueado?
+    const lockout = safeParseJSON(localStorage.getItem(LOCKOUT_KEY));
+    if (lockout && lockout.hasta > Date.now()) {
+      iniciarCountdown(lockout.hasta);
+      return;
+    }
+
+    mostrarLogin();
+  });
+
+  // ─────────────────────────────────────────
+  //  TOGGLE VISIBILIDAD DEL PIN
+  // ─────────────────────────────────────────
+  document.getElementById("toggle-pin").addEventListener("click", () => {
+    const isPassword = pinInput.type === "password";
+    pinInput.type = isPassword ? "text" : "password";
+    document.getElementById("icon-eye").style.display    = isPassword ? "none"  : "block";
+    document.getElementById("icon-eye-off").style.display = isPassword ? "block" : "none";
+    pinInput.focus();
+  });
+
+  // ─────────────────────────────────────────
+  //  LOGIN: click o Enter
+  // ─────────────────────────────────────────
+  btnSubmit.addEventListener("click", handleLogin);
+  pinInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleLogin(); });
+
+  async function handleLogin() {
+    const pin = pinInput.value.trim();
+    if (!pin) { mostrarError("Ingresa tu PIN."); return; }
+
+    ocultarMensajes();
+    setLoading(true);
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "login", pin: pin })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        resetIntentos();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(result.usuario));
+        mostrarDashboard(result.usuario);
+      } else {
+        registrarIntentoFallido(result.message);
+      }
+
+    } catch (err) {
+      mostrarError("Error de conexión. Verifica tu internet e intenta de nuevo.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ─────────────────────────────────────────
+  //  RATE LIMITING LOCAL (5 intentos → bloqueo)
+  // ─────────────────────────────────────────
+  function getIntentos() {
+    return safeParseJSON(localStorage.getItem("intentos_login")) || { count: 0 };
+  }
+
+  function registrarIntentoFallido(mensaje) {
+    const data = getIntentos();
+    data.count = (data.count || 0) + 1;
+    localStorage.setItem("intentos_login", JSON.stringify(data));
+
+    // Marcar punto rojo
+    const dot = document.getElementById("dot-" + data.count);
+    if (dot) dot.classList.add("used");
+
+    if (data.count >= MAX_INTENTOS) {
+      const hasta = Date.now() + BLOQUEO_SEG * 1000;
+      localStorage.setItem(LOCKOUT_KEY, JSON.stringify({ hasta }));
+      localStorage.removeItem("intentos_login");
+      iniciarCountdown(hasta);
+    } else {
+      const restantes = MAX_INTENTOS - data.count;
+      mostrarError(mensaje);
+      if (data.count >= 2) mostrarWarn(`⚠️ Te quedan ${restantes} intento${restantes > 1 ? "s" : ""} antes del bloqueo.`);
+      pinInput.value = "";
+      pinInput.focus();
+    }
+  }
+
+  function resetIntentos() {
+    localStorage.removeItem("intentos_login");
+    localStorage.removeItem(LOCKOUT_KEY);
+    for (let i = 1; i <= MAX_INTENTOS; i++) {
+      const d = document.getElementById("dot-" + i);
+      if (d) d.classList.remove("used");
+    }
+  }
+
+  // ─────────────────────────────────────────
+  //  COUNTDOWN DE BLOQUEO
+  // ─────────────────────────────────────────
+  function iniciarCountdown(hasta) {
+    viewLogin.style.display     = "none";
+    viewDashboard.style.display = "none";
+    viewLockout.style.display   = "block";
+
+    function tick() {
+      const restaSeg = Math.max(0, Math.floor((hasta - Date.now()) / 1000));
+      const m = String(Math.floor(restaSeg / 60)).padStart(2, "0");
+      const s = String(restaSeg % 60).padStart(2, "0");
+      document.getElementById("countdown-timer").textContent = m + ":" + s;
+
+      if (restaSeg <= 0) {
+        clearInterval(countdownInterval);
+        localStorage.removeItem(LOCKOUT_KEY);
+        mostrarLogin();
+      }
+    }
+
+    tick();
+    countdownInterval = setInterval(tick, 1000);
+  }
+
+  // ─────────────────────────────────────────
+  //  LOGOUT
+  // ─────────────────────────────────────────
+  document.getElementById("btn-logout").addEventListener("click", () => {
+    localStorage.removeItem(STORAGE_KEY);
+    mostrarLogin();
+  });
+
+  // ─────────────────────────────────────────
+  //  VISTAS
+  // ─────────────────────────────────────────
+  function mostrarLogin() {
+    viewLockout.style.display   = "none";
+    viewDashboard.style.display = "none";
+    viewLogin.style.display     = "block";
+    pinInput.value = "";
+    pinInput.focus();
+
+    // Restaurar dots según intentos previos
+    const data = getIntentos();
+    for (let i = 1; i <= MAX_INTENTOS; i++) {
+      const d = document.getElementById("dot-" + i);
+      if (d) d.classList.toggle("used", i <= data.count);
+    }
+  }
+
+  function mostrarDashboard(usuario) {
+    viewLogin.style.display     = "none";
+    viewLockout.style.display   = "none";
+    viewDashboard.style.display = "block";
+
+    document.getElementById("user-empresa").textContent = (usuario.nombreEmpresa || "").toUpperCase();
+    document.getElementById("user-nombre").textContent  = usuario.nombre  || "—";
+    document.getElementById("user-cargo").textContent   = usuario.cargo   || "";
+  }
+
+  // ─────────────────────────────────────────
+  //  HELPERS
+  // ─────────────────────────────────────────
+  function mostrarError(msg) {
+    errorBox.textContent      = msg;
+    errorBox.style.display    = "block";
+    warnBox.style.display     = "none";
+  }
+
+  function mostrarWarn(msg) {
+    warnBox.textContent    = msg;
+    warnBox.style.display  = "block";
+  }
+
+  function ocultarMensajes() {
+    errorBox.style.display = "none";
+    warnBox.style.display  = "none";
+  }
+
+  function setLoading(state) {
+    btnSubmit.disabled = state;
+    btnSubmit.innerHTML = state
+      ? '<span class="spinner"></span> Validando...'
+      : 'Ingresar';
+  }
+
+  function safeParseJSON(str) {
+    try { return JSON.parse(str); } catch { return null; }
+  }
+</script>
+</body>
+</html>
