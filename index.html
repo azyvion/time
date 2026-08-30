@@ -253,6 +253,20 @@
     Instalar Time AZV
   </button>
 
+  <!-- Panel éxito instalación Android -->
+  <div id="success-panel" style="display:none; flex-direction:column; align-items:center; gap:1rem; width:100%; max-width:340px; text-align:center; animation: slideUp 0.4s ease;">
+    <div style="width:64px;height:64px;background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div style="color:#fff;font-size:1.15rem;font-weight:800;">¡App instalada!</div>
+    <div style="color:rgba(255,255,255,0.55);font-size:0.9rem;line-height:1.6;">
+      Busca el ícono de <strong style="color:#fff">Time AZV</strong> en tu pantalla de inicio y ábrela desde ahí.
+    </div>
+    <div style="background:rgba(37,99,235,0.15);border:1px solid rgba(37,99,235,0.3);border-radius:0.85rem;padding:0.85rem 1.1rem;color:rgba(255,255,255,0.6);font-size:0.82rem;line-height:1.5;">
+      📌 No uses el navegador — abre siempre desde el ícono de la app para que funcione correctamente.
+    </div>
+  </div>
+
   <!-- Panel iOS (oculto hasta que se detecte iOS) -->
   <div class="ios-panel" id="ios-panel">
     <h3>Instala desde Safari en 3 pasos:</h3>
@@ -327,9 +341,13 @@
     desktopPanel.style.display = desktopPanel.style.display === 'block' ? 'none' : 'block';
   });
 
-  // ── Instalación completada → ir al login ────────────────────────────────────
+  // ── Instalación completada → mostrar pantalla de éxito ─────────────────────
+  // NO redirigir aquí: el usuario está en el browser, no en la app.
+  // La app instalada arranca sola en standalone y entra directo al login.
   window.addEventListener('appinstalled', () => {
-    setTimeout(() => window.location.replace('login.html'), 600);
+    document.querySelector('.requirement-box').style.display = 'none';
+    btnInstall.style.display = 'none';
+    document.getElementById('success-panel').style.display = 'flex';
   });
 
   // ── Lógica inicial según plataforma ─────────────────────────────────────────
