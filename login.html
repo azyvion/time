@@ -704,10 +704,8 @@
     if (usuario.tipo === "EMPLEADO") {
       cargarEstadoMarcaje();
     } else {
-      // Los administradores no marcan asistencia propia en esta vista
-      document.querySelector(".marcaje-header").style.display = "none";
-      document.getElementById("timeline").style.display = "none";
-      document.getElementById("btn-marcar").style.display = "none";
+      // Administradores → panel de admin
+      location.href = "admin.html";
     }
   }
 
