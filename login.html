@@ -2,620 +2,280 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>AsistenciaPWA — Marcaje</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Asistencia SaaS</title>
   <style>
     :root {
-      --bg:            #06101C;
-      --surface:       #0C1B2E;
-      --surface-2:     #112239;
-      --surface-3:     #172E4A;
-      --border:        rgba(255,255,255,0.07);
-      --border-strong: rgba(255,255,255,0.12);
-
-      --blue:          #1A6BFF;
-      --blue-glow:     rgba(26,107,255,0.18);
-      --blue-dim:      rgba(26,107,255,0.08);
-
-      --teal:          #00C8A8;
-      --teal-glow:     rgba(0,200,168,0.14);
-      --teal-dim:      rgba(0,200,168,0.07);
-
-      --red:           #E8365A;
-      --red-glow:      rgba(232,54,90,0.16);
-      --red-dim:       rgba(232,54,90,0.07);
-
-      --amber:         #F5A623;
-      --amber-glow:    rgba(245,166,35,0.12);
-
-      --text:          #C8D9EE;
-      --text-soft:     #6F8FAD;
-      --text-faint:    #2F4A63;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --danger: #ef4444;
+      --success: #10b981;
+      --border: #e2e8f0;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
 
     body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
-      background-image:
-        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(26,107,255,0.09) 0%, transparent 65%);
+      background: linear-gradient(135deg, #dbeafe 0%, #f1f5f9 60%);
       color: var(--text);
-      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      min-height: 100vh;
       padding: 1rem;
     }
 
-    /* ══════════════════════════════════════
-       SHELL
-    ══════════════════════════════════════ */
-    .shell {
+    /* ── Card ── */
+    .card {
+      background: var(--card-bg);
+      padding: 2.5rem 2rem;
+      border-radius: 1.25rem;
+      box-shadow: 0 20px 40px -8px rgba(37,99,235,0.12), 0 4px 12px rgba(0,0,0,0.06);
       width: 100%;
       max-width: 400px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 1.25rem;
-      overflow: hidden;
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.035),
-        0 40px 80px -20px rgba(0,0,0,0.65),
-        0 0 60px -15px rgba(26,107,255,0.1);
     }
 
-    /* ══════════════════════════════════════
-       HEADER
-    ══════════════════════════════════════ */
-    .header {
+    /* ── Logo / Header ── */
+    .logo {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
     }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.55rem;
-    }
-
-    .brand-mark {
-      width: 30px; height: 30px;
-      background: var(--blue);
-      border-radius: 7px;
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: var(--primary);
+      border-radius: 0.6rem;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 14px var(--blue-glow);
-      flex-shrink: 0;
     }
+    .logo-icon svg { width: 22px; height: 22px; fill: white; }
+    .logo-text { font-size: 1.15rem; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
 
-    .brand-mark svg { width: 16px; height: 16px; fill: white; }
-
-    .brand-text { line-height: 1.25; }
-    .brand-name {
-      font-size: 0.85rem; font-weight: 700;
-      color: var(--text); letter-spacing: -0.02em;
-      display: block;
-    }
-    .brand-sub {
-      font-size: 0.62rem; font-weight: 400;
-      color: var(--text-soft);
-      display: block;
-    }
-
-    .btn-logout {
-      display: none;
-      align-items: center; gap: 0.3rem;
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 0.45rem;
-      color: var(--text-soft);
-      font-size: 0.72rem; font-weight: 500;
-      font-family: inherit;
-      cursor: pointer;
-      padding: 0.35rem 0.65rem;
-      transition: all 0.18s;
-    }
-
-    .btn-logout:hover {
-      border-color: var(--border-strong);
-      color: var(--text);
-      background: var(--surface-2);
-    }
-
-    .btn-logout svg { width: 12px; height: 12px; }
-
-    /* ══════════════════════════════════════
-       CLOCK BAND — the signature element
-    ══════════════════════════════════════ */
-    .clock-band {
-      background: var(--surface-2);
-      border-bottom: 1px solid var(--border);
-      padding: 1.5rem 1.25rem 1.25rem;
+    .card-subtitle {
       text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-bottom: 2rem;
     }
 
-    .clock-digits {
-      font-family: 'DM Mono', monospace;
-      font-size: 2.75rem;
-      font-weight: 400;
-      color: #DDE9F8;
-      letter-spacing: 0.02em;
-      line-height: 1;
-      margin-bottom: 0.35rem;
-      /* colon blink handled by CSS — subtle, not distracting */
-    }
+    /* ── Formulario ── */
+    .form-group { margin-bottom: 1.25rem; }
 
-    .clock-colon {
-      animation: blinkColon 1s step-end infinite;
-    }
-
-    @keyframes blinkColon { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
-
-    .clock-date {
-      font-size: 0.73rem;
-      color: var(--text-soft);
-      font-weight: 400;
-      letter-spacing: 0.02em;
-    }
-
-    /* ══════════════════════════════════════
-       BODY
-    ══════════════════════════════════════ */
-    .body { padding: 1.25rem; }
-
-    /* ══════════════════════════════════════
-       VIEWS
-    ══════════════════════════════════════ */
-    .view { display: none; }
-    .view.active { display: block; animation: appear 0.22s ease; }
-    @keyframes appear { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; } }
-
-    /* ══════════════════════════════════════
-       MESSAGES
-    ══════════════════════════════════════ */
-    .msg {
-      display: none;
-      padding: 0.65rem 0.875rem;
-      border-radius: 0.55rem;
-      font-size: 0.78rem;
-      line-height: 1.5;
-      margin-bottom: 1rem;
-    }
-    .msg.error   { background: var(--red-dim);   border: 1px solid rgba(232,54,90,0.22);  color: #FF8099; }
-    .msg.warning { background: var(--amber-glow); border: 1px solid rgba(245,166,35,0.22); color: #F5C472; }
-
-    /* ══════════════════════════════════════
-       LOGIN
-    ══════════════════════════════════════ */
-    .login-hint {
-      font-size: 0.78rem;
-      color: var(--text-soft);
-      margin-bottom: 1.25rem;
-      line-height: 1.55;
-    }
-
-    .field-label {
+    label {
       display: block;
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: var(--text-soft);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       margin-bottom: 0.45rem;
-      letter-spacing: 0.035em;
+      color: var(--text-muted);
     }
 
-    .pin-wrap { position: relative; margin-bottom: 1rem; }
+    .pin-wrapper { position: relative; }
 
-    .pin-input {
+    input[type="password"] {
       width: 100%;
-      padding: 0.85rem 3rem 0.85rem 1rem;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
+      padding: 0.85rem 2.8rem 0.85rem 1rem;
+      border: 1.5px solid var(--border);
       border-radius: 0.65rem;
-      color: var(--text);
-      font-family: 'DM Mono', monospace;
-      font-size: 1.5rem;
-      letter-spacing: 0.38em;
+      font-size: 1.4rem;
+      letter-spacing: 0.35em;
       text-align: center;
-      transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-
-    .pin-input:focus {
+    input[type="password"]:focus {
       outline: none;
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px var(--blue-glow);
-      background: var(--surface-3);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+      background: #fff;
     }
+    input[type="password"]::placeholder { letter-spacing: 0.25em; color: #cbd5e1; font-size: 1rem; }
 
-    .pin-input::placeholder {
-      color: var(--text-faint);
-      font-size: 1rem;
-      letter-spacing: 0.28em;
-    }
-
-    .btn-eye {
-      position: absolute; right: 0.75rem; top: 50%;
+    /* Ojo para mostrar/ocultar PIN */
+    .toggle-pin {
+      position: absolute;
+      right: 0.85rem;
+      top: 50%;
       transform: translateY(-50%);
-      background: none; border: none; cursor: pointer;
-      color: var(--text-soft); padding: 0.2rem;
-      border-radius: 0.3rem;
-      display: flex; align-items: center;
-      transition: color 0.18s;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
     }
-    .btn-eye:hover { color: var(--text); }
-    .btn-eye svg { width: 16px; height: 16px; }
+    .toggle-pin svg { width: 18px; height: 18px; }
 
-    /* attempts */
-    .attempts {
-      display: flex; gap: 0.35rem; justify-content: center;
-      margin-top: 0.875rem;
+    /* ── Botón principal ── */
+    .btn-primary {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0.65rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+      letter-spacing: 0.02em;
     }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-dark);
+      box-shadow: 0 6px 16px rgba(37,99,235,0.35);
+    }
+    .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+    .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
 
-    .dot {
-      height: 3px; flex: 1; max-width: 44px;
-      border-radius: 99px;
-      background: var(--surface-3);
-      border: 1px solid var(--border);
-      transition: all 0.25s;
-    }
-
-    .dot.used {
-      background: var(--red);
-      border-color: var(--red);
-      box-shadow: 0 0 5px var(--red-glow);
-    }
-
-    /* ══════════════════════════════════════
-       BUTTONS
-    ══════════════════════════════════════ */
-    .btn {
-      width: 100%; padding: 0.85rem 1rem;
-      border: none; border-radius: 0.7rem;
-      font-size: 0.9rem; font-weight: 600;
-      font-family: inherit; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 0.45rem;
-      transition: all 0.18s; letter-spacing: 0.005em;
-    }
-
-    .btn:disabled {
-      background: var(--surface-3) !important;
-      color: var(--text-soft) !important;
-      cursor: not-allowed; box-shadow: none !important;
-      transform: none !important;
-    }
-
-    .btn-blue {
-      background: var(--blue); color: #fff;
-      box-shadow: 0 4px 14px var(--blue-glow);
-    }
-    .btn-blue:hover:not(:disabled) {
-      filter: brightness(1.08);
-      box-shadow: 0 6px 22px rgba(26,107,255,0.35);
-      transform: translateY(-1px);
-    }
-    .btn-blue:active:not(:disabled) { transform: scale(0.985); }
-
-    .btn-red {
-      background: var(--red); color: #fff;
-      box-shadow: 0 4px 14px var(--red-glow);
-    }
-    .btn-red:hover:not(:disabled) {
-      filter: brightness(1.08);
-      box-shadow: 0 6px 22px rgba(232,54,90,0.4);
-      transform: translateY(-1px);
-    }
-    .btn-red:active:not(:disabled) { transform: scale(0.985); }
-
-    /* spinner */
-    .spinner {
-      width: 13px; height: 13px;
-      border: 2px solid rgba(255,255,255,0.25);
-      border-top-color: #fff;
+    /* Spinner dentro del botón */
+    .btn-primary .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
       border-radius: 50%;
-      animation: spin 0.65s linear infinite;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.5rem;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ══════════════════════════════════════
-       DASHBOARD
-    ══════════════════════════════════════ */
-
-    /* Employee strip */
-    .emp-strip {
-      display: flex; align-items: center; gap: 0.75rem;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 0.75rem;
-      padding: 0.75rem 0.875rem;
-      margin-bottom: 1rem;
-    }
-
-    .emp-avatar {
-      width: 40px; height: 40px;
-      border-radius: 0.5rem;
-      background: var(--blue);
-      box-shadow: 0 0 10px var(--blue-glow);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.95rem; font-weight: 700; color: #fff;
-      flex-shrink: 0;
-    }
-
-    .emp-info { flex: 1; min-width: 0; }
-    .emp-company {
-      font-size: 0.62rem; font-weight: 600;
-      color: var(--blue); letter-spacing: 0.04em;
-      text-transform: uppercase; margin-bottom: 0.1rem;
-    }
-    .emp-name {
-      font-size: 0.9rem; font-weight: 700; color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .emp-role { font-size: 0.7rem; color: var(--text-soft); margin-top: 0.08rem; }
-
-    .live-pip {
-      display: flex; align-items: center; gap: 0.3rem;
-      font-size: 0.65rem; font-weight: 500;
-      color: var(--teal); white-space: nowrap;
-    }
-    .live-pip::before {
-      content: ''; display: block;
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--teal);
-      animation: glow 2s infinite;
-    }
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 0 3px var(--teal); opacity: 1; }
-      50% { box-shadow: none; opacity: 0.45; }
-    }
-
-    /* ─── Marcaje panel ─── */
-    .marcaje-panel {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 0.75rem;
-      overflow: hidden;
-      margin-bottom: 1rem;
-    }
-
-    .panel-header {
-      padding: 0.65rem 0.875rem;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.65rem; font-weight: 600;
-      color: var(--text-soft);
-      letter-spacing: 0.03em;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-
-    .panel-date {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem; color: var(--text-soft);
-    }
-
-    .marcaje-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.75rem 0.875rem;
-    }
-
-    .marcaje-row + .marcaje-row { border-top: 1px solid var(--border); }
-
-    .row-left {
-      display: flex; align-items: center; gap: 0.55rem;
-    }
-
-    .row-pip {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--surface-3);
-      border: 1.5px solid var(--text-faint);
-      transition: all 0.3s;
-      flex-shrink: 0;
-    }
-    .row-pip.done {
-      background: var(--teal); border-color: var(--teal);
-      box-shadow: 0 0 5px var(--teal-glow);
-    }
-    .row-pip.pending {
-      background: transparent; border-color: var(--text-soft);
-      border-style: dashed;
-    }
-
-    .row-label {
-      font-size: 0.78rem; font-weight: 500; color: var(--text-soft);
-    }
-
-    .row-time {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.88rem; font-weight: 500; color: var(--text);
-    }
-
-    .row-time.empty {
-      color: var(--text-faint); font-size: 0.78rem;
-    }
-
-    /* Duration line */
-    .duration-line {
-      padding: 0.5rem 0.875rem;
-      border-top: 1px solid var(--border);
-      background: var(--teal-dim);
-      display: none;
-    }
-
-    .duration-pill {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      font-size: 0.7rem; font-weight: 600;
-      color: var(--teal);
-    }
-
-    /* ─── Jornada completa ─── */
-    .jornada-ok {
-      background: var(--teal-dim);
-      border: 1px solid rgba(0,200,168,0.18);
-      border-radius: 0.75rem;
-      padding: 1rem;
+    /* ── Mensajes ── */
+    .msg {
+      padding: 0.75rem 1rem;
+      border-radius: 0.6rem;
+      font-size: 0.85rem;
       text-align: center;
       margin-bottom: 1rem;
       display: none;
+      line-height: 1.4;
     }
+    .msg.error   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .msg.warning { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
 
-    .jornada-ok .check-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
-    .jornada-ok h3 { font-size: 0.875rem; font-weight: 700; color: var(--teal); margin-bottom: 0.2rem; }
-    .jornada-ok p  { font-size: 0.73rem; color: var(--text-soft); line-height: 1.5; }
-
-    /* ─── Geo strip ─── */
-    .geo-strip {
-      display: flex; align-items: center; gap: 0.4rem;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 0.5rem;
-      padding: 0.45rem 0.7rem;
-      margin-top: 0.875rem;
-      font-size: 0.68rem;
-      color: var(--text-soft);
-      transition: all 0.25s;
+    /* Intentos fallidos */
+    .attempts-bar {
+      display: flex;
+      gap: 0.35rem;
+      justify-content: center;
+      margin-top: 0.75rem;
+      height: 5px;
     }
-
-    .geo-strip svg { width: 11px; height: 11px; flex-shrink: 0; opacity: 0.6; }
-
-    .geo-strip.ready {
-      color: var(--teal);
-      background: var(--teal-dim);
-      border-color: rgba(0,200,168,0.2);
+    .attempt-dot {
+      flex: 1;
+      max-width: 50px;
+      border-radius: 99px;
+      background: #e2e8f0;
+      transition: background 0.3s;
     }
+    .attempt-dot.used { background: var(--danger); }
 
-    .geo-strip.ready svg { opacity: 1; }
+    /* ── Dashboard ── */
+    .dashboard { display: none; }
 
-    .geo-strip.denied {
-      color: #E8A090;
-      background: var(--red-dim);
-      border-color: rgba(232,54,90,0.18);
-    }
-
-    /* ══════════════════════════════════════
-       LOCKOUT
-    ══════════════════════════════════════ */
-    .lockout-body {
-      padding: 2rem 1.25rem;
-      text-align: center;
-    }
-
-    .lock-icon-wrap {
-      width: 56px; height: 56px;
-      background: var(--red-dim);
-      border: 1px solid rgba(232,54,90,0.22);
-      border-radius: 0.875rem;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
-      margin: 0 auto 1rem;
-    }
-
-    .lockout-body h3 {
-      font-size: 1rem; font-weight: 700; color: var(--red);
-      margin-bottom: 0.4rem;
-    }
-
-    .lockout-body p {
-      font-size: 0.78rem; color: var(--text-soft);
-      line-height: 1.6; margin-bottom: 1.25rem; max-width: 280px; margin-inline: auto;
-    }
-
-    .countdown-box {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
+    .user-card {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 1rem 1.25rem;
       border-radius: 0.75rem;
-      padding: 0.875rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .user-card .company {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #3b82f6;
+      margin-bottom: 0.2rem;
+    }
+    .user-card .name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .user-card .role {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
     }
 
-    .countdown-lbl {
-      font-size: 0.62rem; font-weight: 600;
-      color: var(--text-soft); letter-spacing: 0.04em;
-      margin-bottom: 0.3rem;
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--success);
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 0.4rem 0.85rem;
+      border-radius: 99px;
+      margin-bottom: 1.5rem;
     }
+    .status-badge span { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 1.8s infinite; display: inline-block; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
-    .countdown-time {
-      font-family: 'DM Mono', monospace;
-      font-size: 2rem; font-weight: 500;
-      color: var(--red);
-      letter-spacing: 0.05em;
+    .btn-logout {
+      width: 100%;
+      padding: 0.75rem;
+      background: transparent;
+      color: var(--danger);
+      border: 1.5px solid var(--danger);
+      border-radius: 0.65rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
     }
+    .btn-logout:hover { background: #fef2f2; }
 
-    /* ══════════════════════════════════════
-       TOAST
-    ══════════════════════════════════════ */
-    .toast {
-      position: fixed; bottom: 1.25rem; left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--surface-2);
-      border: 1px solid var(--border-strong);
-      border-radius: 0.75rem;
-      padding: 0.65rem 1rem;
-      display: flex; align-items: center; gap: 0.55rem;
-      font-size: 0.8rem; font-weight: 500; color: var(--text);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.45);
-      transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1);
-      z-index: 999; white-space: nowrap;
-      max-width: calc(100vw - 2rem);
-    }
-
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast-ic { font-size: 1rem; }
+    /* ── Bloqueado ── */
+    .lockout { display: none; text-align: center; }
+    .lockout-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .lockout h3 { color: var(--danger); margin-bottom: 0.5rem; }
+    .lockout p { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem; }
+    .countdown { font-size: 1.5rem; font-weight: 700; color: var(--danger); }
   </style>
 </head>
 <body>
 
-<div class="shell">
+<div class="card">
 
-  <!-- ── HEADER ── -->
-  <header class="header">
-    <div class="brand">
-      <div class="brand-mark">
-        <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+  <!-- ════════════════ VISTA: LOGIN ════════════════ -->
+  <div id="view-login">
+
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
       </div>
-      <div class="brand-text">
-        <span class="brand-name">AsistenciaPWA</span>
-        <span class="brand-sub">Control de Asistencia</span>
-      </div>
+      <span class="logo-text">AsistenciaPWA</span>
     </div>
-    <button class="btn-logout" id="btn-logout">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-        <polyline points="16 17 21 12 16 7"/>
-        <line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
-      Salir
-    </button>
-  </header>
+    <p class="card-subtitle">Ingresa tu PIN para marcar asistencia</p>
 
-  <!-- ── CLOCK BAND ── -->
-  <div class="clock-band">
-    <div class="clock-digits" id="clock-time">
-      <span id="ct-h">00</span><span class="clock-colon">:</span><span id="ct-m">00</span><span class="clock-colon">:</span><span id="ct-s">00</span>
-    </div>
-    <div class="clock-date" id="clock-date">—</div>
-  </div>
+    <div id="error-box" class="msg error"></div>
+    <div id="warn-box"  class="msg warning"></div>
 
-  <!-- ════════ VIEW: LOGIN ════════ -->
-  <div id="view-login" class="view">
-    <div class="body">
-
-      <p class="login-hint">Ingresa tu PIN para registrar tu asistencia del día.</p>
-
-      <div id="error-box" class="msg error"></div>
-      <div id="warn-box"  class="msg warning"></div>
-
-      <label class="field-label" for="pin">PIN de empleado</label>
-      <div class="pin-wrap">
-        <input class="pin-input" type="password" id="pin"
-               inputmode="numeric" placeholder="· · · ·"
-               maxlength="8" autocomplete="off" autofocus>
-        <button class="btn-eye" id="toggle-pin" type="button" aria-label="Mostrar PIN">
+    <div class="form-group">
+      <label for="pin">PIN de Empleado</label>
+      <div class="pin-wrapper">
+        <input type="password" id="pin" inputmode="numeric"
+               placeholder="· · · ·" maxlength="8" required autofocus autocomplete="off">
+        <button type="button" class="toggle-pin" id="toggle-pin" aria-label="Mostrar PIN">
+          <!-- ojo abierto -->
           <svg id="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
             <circle cx="12" cy="12" r="3"/>
           </svg>
+          <!-- ojo cerrado (oculto por defecto) -->
           <svg id="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
             <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
@@ -623,517 +283,302 @@
           </svg>
         </button>
       </div>
-
-      <button id="btn-submit" class="btn btn-blue" type="button">Ingresar</button>
-
-      <div class="attempts" id="attempts-bar">
-        <div class="dot" id="dot-1"></div>
-        <div class="dot" id="dot-2"></div>
-        <div class="dot" id="dot-3"></div>
-        <div class="dot" id="dot-4"></div>
-        <div class="dot" id="dot-5"></div>
-      </div>
-
     </div>
+
+    <button type="button" id="btn-submit" class="btn-primary">Ingresar</button>
+
+    <!-- Indicador de intentos -->
+    <div class="attempts-bar" id="attempts-bar">
+      <div class="attempt-dot" id="dot-1"></div>
+      <div class="attempt-dot" id="dot-2"></div>
+      <div class="attempt-dot" id="dot-3"></div>
+      <div class="attempt-dot" id="dot-4"></div>
+      <div class="attempt-dot" id="dot-5"></div>
+    </div>
+
   </div>
 
-  <!-- ════════ VIEW: DASHBOARD ════════ -->
-  <div id="view-dashboard" class="view">
-    <div class="body">
-
-      <!-- Employee strip -->
-      <div class="emp-strip">
-        <div class="emp-avatar" id="user-avatar">?</div>
-        <div class="emp-info">
-          <div class="emp-company" id="user-empresa">—</div>
-          <div class="emp-name"    id="user-nombre">Cargando…</div>
-          <div class="emp-role"    id="user-cargo"></div>
-        </div>
-        <div class="live-pip">Activo</div>
-      </div>
-
-      <!-- Marcaje panel -->
-      <div class="marcaje-panel">
-        <div class="panel-header">
-          <span>Marcaje de hoy</span>
-          <span class="panel-date" id="panel-date">—</span>
-        </div>
-
-        <div class="marcaje-row">
-          <div class="row-left">
-            <span class="row-pip" id="pip-entrada"></span>
-            <span class="row-label">Entrada</span>
-          </div>
-          <span class="row-time empty" id="time-entrada">—:—:—</span>
-        </div>
-
-        <div class="marcaje-row">
-          <div class="row-left">
-            <span class="row-pip" id="pip-salida"></span>
-            <span class="row-label">Salida</span>
-          </div>
-          <span class="row-time empty" id="time-salida">—:—:—</span>
-        </div>
-
-        <div class="duration-line" id="duration-line">
-          <div class="duration-pill" id="duration-pill">⏱ —</div>
-        </div>
-      </div>
-
-      <!-- Jornada completa banner -->
-      <div class="jornada-ok" id="jornada-ok">
-        <div class="check-icon">✅</div>
-        <h3>Jornada registrada</h3>
-        <p>Tu asistencia de hoy quedó guardada. Nos vemos mañana.</p>
-      </div>
-
-      <!-- Action button -->
-      <div id="action-wrap">
-        <button id="btn-marcaje" class="btn btn-blue" type="button">
-          Marcar Entrada
-        </button>
-      </div>
-
-      <!-- Geo strip -->
-      <div class="geo-strip" id="geo-strip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="10" r="3"/>
-          <path d="M12 2a8 8 0 0 1 8 8c0 5.25-8 14-8 14S4 15.25 4 10a8 8 0 0 1 8-8z"/>
-        </svg>
-        <span id="geo-label">Solicitando ubicación…</span>
-      </div>
-
-    </div>
+  <!-- ════════════════ VISTA: BLOQUEADO ════════════════ -->
+  <div id="view-lockout" class="lockout">
+    <div class="lockout-icon">🔒</div>
+    <h3>Acceso bloqueado</h3>
+    <p>Demasiados intentos fallidos. Espera antes de volver a intentarlo.</p>
+    <div class="countdown" id="countdown-timer">05:00</div>
+    <p style="margin-top:0.5rem; font-size:0.78rem;">El bloqueo se levantará automáticamente</p>
   </div>
 
-  <!-- ════════ VIEW: LOCKOUT ════════ -->
-  <div id="view-lockout" class="view">
-    <div class="lockout-body">
-      <div class="lock-icon-wrap">🔒</div>
-      <h3>Acceso bloqueado</h3>
-      <p>Demasiados intentos fallidos. Por seguridad, el acceso está suspendido temporalmente.</p>
-      <div class="countdown-box">
-        <div class="countdown-lbl">Tiempo restante</div>
-        <div class="countdown-time" id="countdown-timer">05:00</div>
+  <!-- ════════════════ VISTA: DASHBOARD ════════════════ -->
+  <div id="view-dashboard" class="dashboard">
+
+    <div class="logo" style="margin-bottom:1.5rem">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
       </div>
+      <span class="logo-text">AsistenciaPWA</span>
     </div>
+
+    <div class="user-card">
+      <div class="company" id="user-empresa">—</div>
+      <div class="name"    id="user-nombre">Cargando...</div>
+      <div class="role"    id="user-cargo"></div>
+    </div>
+
+    <div style="text-align:center">
+      <span class="status-badge">
+        <span></span> Sesión activa
+      </span>
+    </div>
+
+    <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; margin-bottom:1.5rem;">
+      Listo para integrar geolocalización y botones de marcación.
+    </p>
+
+    <button id="btn-logout" class="btn-logout">Cerrar sesión</button>
   </div>
 
-</div><!-- /shell -->
-
-<!-- Toast -->
-<div class="toast" id="toast">
-  <span class="toast-ic" id="toast-ic"></span>
-  <span id="toast-msg"></span>
-</div>
+</div><!-- /card -->
 
 <script>
-  /* ══════════════════════════════════
-     CONFIG
-  ══════════════════════════════════ */
-  const API_URL     = "https://script.google.com/macros/s/AKfycbzF4VXoD2rU0iBjb5If39ZsT2GnGdaQawgATS3k8x7xqq2XvzZ7hOz-enu6l0m7IVvcnw/exec";
-  const MAX_TRY     = 5;
-  const LOCK_SECS   = 5 * 60;
-  const KEY_SES     = "sesion_asistencia";
-  const KEY_LOCK    = "lockout_asistencia";
-  const KEY_TRY     = "intentos_login";
+  // ─────────────────────────────────────────
+  //  CONFIGURACIÓN
+  // ─────────────────────────────────────────
+  const API_URL = "https://script.google.com/macros/s/AKfycbzF4VXoD2rU0iBjb5If39ZsT2GnGdaQawgATS3k8x7xqq2XvzZ7hOz-enu6l0m7IVvcnw/exec";
 
-  /* ══════════════════════════════════
-     DOM
-  ══════════════════════════════════ */
-  const vLogin     = document.getElementById("view-login");
-  const vDash      = document.getElementById("view-dashboard");
-  const vLock      = document.getElementById("view-lockout");
-  const pinInput   = document.getElementById("pin");
-  const btnSubmit  = document.getElementById("btn-submit");
-  const errorBox   = document.getElementById("error-box");
-  const warnBox    = document.getElementById("warn-box");
-  const btnLogout  = document.getElementById("btn-logout");
-  const btnMarcaje = document.getElementById("btn-marcaje");
-  const geoStrip   = document.getElementById("geo-strip");
-  const geoLabel   = document.getElementById("geo-label");
-  const toastEl    = document.getElementById("toast");
+  const MAX_INTENTOS   = 5;       // bloqueo tras N fallos
+  const BLOQUEO_SEG    = 5 * 60;  // duración del bloqueo en segundos (5 min)
+  const STORAGE_KEY    = "sesion_asistencia";
+  const LOCKOUT_KEY    = "lockout_asistencia";
 
-  const DIAS   = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
-  const MESES  = ["enero","febrero","marzo","abril","mayo","junio",
-                  "julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  // ─────────────────────────────────────────
+  //  REFERENCIAS DOM
+  // ─────────────────────────────────────────
+  const viewLogin     = document.getElementById("view-login");
+  const viewDashboard = document.getElementById("view-dashboard");
+  const viewLockout   = document.getElementById("view-lockout");
 
-  let geoCoords       = null;
-  let lockTimer       = null;
-  let toastTimer      = null;
-  let currentSesion   = null;
+  const pinInput  = document.getElementById("pin");
+  const btnSubmit = document.getElementById("btn-submit");
+  const errorBox  = document.getElementById("error-box");
+  const warnBox   = document.getElementById("warn-box");
 
-  /* ══════════════════════════════════
-     LIVE CLOCK
-  ══════════════════════════════════ */
-  (function clock() {
-    function tick() {
-      const d  = new Date();
-      document.getElementById("ct-h").textContent = pad(d.getHours());
-      document.getElementById("ct-m").textContent = pad(d.getMinutes());
-      document.getElementById("ct-s").textContent = pad(d.getSeconds());
-      document.getElementById("clock-date").textContent =
-        `${DIAS[d.getDay()]}, ${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`;
+  let countdownInterval = null;
+
+  // ─────────────────────────────────────────
+  //  INICIO: verificar sesión o bloqueo
+  // ─────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", async () => {
+    // ¿Existe sesión guardada? — se valida contra el servidor, no basta con que exista localmente
+    const sesion = safeParseJSON(localStorage.getItem(STORAGE_KEY));
+    if (sesion) {
+      const valida = await verificarSesionServidor(sesion);
+      if (valida) { mostrarDashboard(sesion); return; }
+      localStorage.removeItem(STORAGE_KEY); // token vencido/inválido: limpiar y pedir login de nuevo
     }
-    tick();
-    setInterval(tick, 1000);
-  })();
 
-  /* ══════════════════════════════════
-     INIT
-  ══════════════════════════════════ */
-  document.addEventListener("DOMContentLoaded", () => {
-    const ses  = safeParse(localStorage.getItem(KEY_SES));
-    if (ses) { mostrarDash(ses); return; }
-
-    const lo = safeParse(localStorage.getItem(KEY_LOCK));
-    if (lo && lo.hasta > Date.now()) { startCountdown(lo.hasta); return; }
+    // ¿Está bloqueado?
+    const lockout = safeParseJSON(localStorage.getItem(LOCKOUT_KEY));
+    if (lockout && lockout.hasta > Date.now()) {
+      iniciarCountdown(lockout.hasta);
+      return;
+    }
 
     mostrarLogin();
   });
 
-  /* ══════════════════════════════════
-     TOGGLE PIN
-  ══════════════════════════════════ */
+  async function verificarSesionServidor(sesion) {
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "verificarSesion", token: sesion.token, idEmpleado: sesion.id })
+      });
+      const result = await response.json();
+      return !!(result.success && result.valida);
+    } catch (err) {
+      // Sin conexión: se confía temporalmente en la sesión local para no bloquear al usuario offline
+      console.error(err);
+      return true;
+    }
+  }
+
+  // ─────────────────────────────────────────
+  //  TOGGLE VISIBILIDAD DEL PIN
+  // ─────────────────────────────────────────
   document.getElementById("toggle-pin").addEventListener("click", () => {
-    const isPass = pinInput.type === "password";
-    pinInput.type = isPass ? "text" : "password";
-    document.getElementById("icon-eye").style.display     = isPass ? "none"  : "block";
-    document.getElementById("icon-eye-off").style.display  = isPass ? "block" : "none";
+    const isPassword = pinInput.type === "password";
+    pinInput.type = isPassword ? "text" : "password";
+    document.getElementById("icon-eye").style.display    = isPassword ? "none"  : "block";
+    document.getElementById("icon-eye-off").style.display = isPassword ? "block" : "none";
     pinInput.focus();
   });
 
-  /* ══════════════════════════════════
-     LOGIN
-  ══════════════════════════════════ */
-  btnSubmit.addEventListener("click", doLogin);
-  pinInput.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+  // ─────────────────────────────────────────
+  //  LOGIN: click o Enter
+  // ─────────────────────────────────────────
+  btnSubmit.addEventListener("click", handleLogin);
+  pinInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleLogin(); });
 
-  async function doLogin() {
+  async function handleLogin() {
     const pin = pinInput.value.trim();
-    if (!pin) { showError("Ingresa tu PIN."); return; }
-    clearMsgs(); setLoading(true);
+    if (!pin) { mostrarError("Ingresa tu PIN."); return; }
+
+    ocultarMensajes();
+    setLoading(true);
+
     try {
-      const res    = await fetch(API_URL, {
-        method:  "POST",
+      const response = await fetch(API_URL, {
+        method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body:    JSON.stringify({ action: "login", pin })
+        body: JSON.stringify({ action: "login", pin: pin })
       });
-      const data = await res.json();
-      if (data.success) {
-        resetTry();
-        // store pin in session for marcaje calls
-        data.usuario._pin = pin;
-        localStorage.setItem(KEY_SES, JSON.stringify(data.usuario));
-        mostrarDash(data.usuario);
+
+      const result = await response.json();
+
+      if (result.success) {
+        resetIntentos();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(result.usuario));
+        mostrarDashboard(result.usuario);
       } else {
-        failTry(data.message);
+        registrarIntentoFallido(result.message);
       }
-    } catch {
-      showError("Error de conexión. Verifica tu internet.");
+
+    } catch (err) {
+      mostrarError("Error de conexión. Verifica tu internet e intenta de nuevo.");
+      console.error(err);
     } finally {
       setLoading(false);
     }
   }
 
-  /* ══════════════════════════════════
-     RATE LIMITING
-  ══════════════════════════════════ */
-  function getTry()  { return safeParse(localStorage.getItem(KEY_TRY)) || { count: 0 }; }
+  // ─────────────────────────────────────────
+  //  RATE LIMITING LOCAL (5 intentos → bloqueo)
+  // ─────────────────────────────────────────
+  function getIntentos() {
+    return safeParseJSON(localStorage.getItem("intentos_login")) || { count: 0 };
+  }
 
-  function failTry(msg) {
-    const d = getTry();
-    d.count = (d.count || 0) + 1;
-    localStorage.setItem(KEY_TRY, JSON.stringify(d));
-    const dot = document.getElementById("dot-" + d.count);
+  function registrarIntentoFallido(mensaje) {
+    const data = getIntentos();
+    data.count = (data.count || 0) + 1;
+    localStorage.setItem("intentos_login", JSON.stringify(data));
+
+    // Marcar punto rojo
+    const dot = document.getElementById("dot-" + data.count);
     if (dot) dot.classList.add("used");
 
-    if (d.count >= MAX_TRY) {
-      const hasta = Date.now() + LOCK_SECS * 1000;
-      localStorage.setItem(KEY_LOCK, JSON.stringify({ hasta }));
-      localStorage.removeItem(KEY_TRY);
-      startCountdown(hasta);
+    if (data.count >= MAX_INTENTOS) {
+      const hasta = Date.now() + BLOQUEO_SEG * 1000;
+      localStorage.setItem(LOCKOUT_KEY, JSON.stringify({ hasta }));
+      localStorage.removeItem("intentos_login");
+      iniciarCountdown(hasta);
     } else {
-      const left = MAX_TRY - d.count;
-      showError(msg || "PIN incorrecto.");
-      if (d.count >= 2) showWarn(`Te quedan ${left} intento${left > 1 ? "s" : ""} antes del bloqueo.`);
-      pinInput.value = ""; pinInput.focus();
+      const restantes = MAX_INTENTOS - data.count;
+      mostrarError(mensaje);
+      if (data.count >= 2) mostrarWarn(`⚠️ Te quedan ${restantes} intento${restantes > 1 ? "s" : ""} antes del bloqueo.`);
+      pinInput.value = "";
+      pinInput.focus();
     }
   }
 
-  function resetTry() {
-    localStorage.removeItem(KEY_TRY);
-    localStorage.removeItem(KEY_LOCK);
-    for (let i = 1; i <= MAX_TRY; i++) {
+  function resetIntentos() {
+    localStorage.removeItem("intentos_login");
+    localStorage.removeItem(LOCKOUT_KEY);
+    for (let i = 1; i <= MAX_INTENTOS; i++) {
       const d = document.getElementById("dot-" + i);
       if (d) d.classList.remove("used");
     }
   }
 
-  /* ══════════════════════════════════
-     COUNTDOWN
-  ══════════════════════════════════ */
-  function startCountdown(hasta) {
-    mostrarVista(vLock);
-    btnLogout.style.display = "none";
-    clearInterval(lockTimer);
+  // ─────────────────────────────────────────
+  //  COUNTDOWN DE BLOQUEO
+  // ─────────────────────────────────────────
+  function iniciarCountdown(hasta) {
+    viewLogin.style.display     = "none";
+    viewDashboard.style.display = "none";
+    viewLockout.style.display   = "block";
 
     function tick() {
-      const seg = Math.max(0, Math.floor((hasta - Date.now()) / 1000));
-      document.getElementById("countdown-timer").textContent =
-        pad(Math.floor(seg / 60)) + ":" + pad(seg % 60);
-      if (seg <= 0) {
-        clearInterval(lockTimer);
-        localStorage.removeItem(KEY_LOCK);
+      const restaSeg = Math.max(0, Math.floor((hasta - Date.now()) / 1000));
+      const m = String(Math.floor(restaSeg / 60)).padStart(2, "0");
+      const s = String(restaSeg % 60).padStart(2, "0");
+      document.getElementById("countdown-timer").textContent = m + ":" + s;
+
+      if (restaSeg <= 0) {
+        clearInterval(countdownInterval);
+        localStorage.removeItem(LOCKOUT_KEY);
         mostrarLogin();
       }
     }
+
     tick();
-    lockTimer = setInterval(tick, 1000);
+    countdownInterval = setInterval(tick, 1000);
   }
 
-  /* ══════════════════════════════════
-     LOGOUT
-  ══════════════════════════════════ */
-  btnLogout.addEventListener("click", () => {
-    localStorage.removeItem(KEY_SES);
-    currentSesion = null;
+  // ─────────────────────────────────────────
+  //  LOGOUT
+  // ─────────────────────────────────────────
+  document.getElementById("btn-logout").addEventListener("click", () => {
+    localStorage.removeItem(STORAGE_KEY);
     mostrarLogin();
   });
 
-  /* ══════════════════════════════════
-     MARCAJE (un marcaje por día)
-  ══════════════════════════════════ */
-  function hoyISO() {
-    const d = new Date();
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  }
-
-  function getMarcaje()   { return safeParse(localStorage.getItem("m_" + hoyISO())) || {}; }
-  function saveMarcaje(m) { localStorage.setItem("m_" + hoyISO(), JSON.stringify(m)); }
-
-  function renderMarcaje() {
-    const m = getMarcaje();
-
-    const pipE = document.getElementById("pip-entrada");
-    const pipS = document.getElementById("pip-salida");
-    const tE   = document.getElementById("time-entrada");
-    const tS   = document.getElementById("time-salida");
-    const durLine = document.getElementById("duration-line");
-    const durPill = document.getElementById("duration-pill");
-    const jorOk   = document.getElementById("jornada-ok");
-    const actWrap = document.getElementById("action-wrap");
-
-    // Panel date
-    document.getElementById("panel-date").textContent = hoyISO();
-
-    // Entrada
-    if (m.entrada) {
-      pipE.className = "row-pip done";
-      tE.className   = "row-time";
-      tE.textContent = m.entrada;
-    } else {
-      pipE.className = "row-pip pending";
-      tE.className   = "row-time empty";
-      tE.textContent = "—:—:—";
-    }
-
-    // Salida
-    if (m.salida) {
-      pipS.className = "row-pip done";
-      tS.className   = "row-time";
-      tS.textContent = m.salida;
-    } else {
-      pipS.className = "row-pip pending";
-      tS.className   = "row-time empty";
-      tS.textContent = "—:—:—";
-    }
-
-    // Duration
-    if (m.entrada && m.salida && m.salidaTs && m.entradaTs) {
-      const mins = Math.round((m.salidaTs - m.entradaTs) / 60000);
-      const hh   = Math.floor(mins / 60);
-      const mm   = mins % 60;
-      durPill.textContent = `⏱ ${hh}h ${mm}min trabajados`;
-      durLine.style.display = "block";
-    } else {
-      durLine.style.display = "none";
-    }
-
-    // State logic — one marcaje per day
-    if (!m.entrada) {
-      // Needs entry → blue button
-      btnMarcaje.textContent = "Marcar Entrada";
-      btnMarcaje.className   = "btn btn-blue";
-      btnMarcaje.disabled    = false;
-      jorOk.style.display    = "none";
-      actWrap.style.display  = "block";
-
-    } else if (!m.salida) {
-      // Entry done, needs exit → red button
-      btnMarcaje.textContent = "Marcar Salida";
-      btnMarcaje.className   = "btn btn-red";
-      btnMarcaje.disabled    = false;
-      jorOk.style.display    = "none";
-      actWrap.style.display  = "block";
-
-    } else {
-      // Both done → jornada completa, hide button
-      actWrap.style.display = "none";
-      jorOk.style.display   = "block";
-    }
-  }
-
-  btnMarcaje.addEventListener("click", async () => {
-    const m    = getMarcaje();
-    const tipo = !m.entrada ? "entrada" : "salida";
-    const ses  = safeParse(localStorage.getItem(KEY_SES));
-
-    btnMarcaje.disabled  = true;
-    btnMarcaje.innerHTML = '<span class="spinner"></span> Registrando…';
-
-    const now = new Date();
-    const hora = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-
-    // Fire API (best-effort — local storage is source of truth)
-    try {
-      await fetch(API_URL, {
-        method:  "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body:    JSON.stringify({
-          action: tipo === "entrada" ? "marcarEntrada" : "marcarSalida",
-          pin:    ses?._pin || "",
-          hora,
-          fecha:  hoyISO(),
-          lat:    geoCoords?.latitude  ?? null,
-          lng:    geoCoords?.longitude ?? null,
-        })
-      });
-    } catch { /* fallo silencioso — marcaje local se guarda igual */ }
-
-    // Persist locally
-    if (tipo === "entrada") {
-      m.entrada   = hora;
-      m.entradaTs = now.getTime();
-    } else {
-      m.salida    = hora;
-      m.salidaTs  = now.getTime();
-    }
-    saveMarcaje(m);
-    renderMarcaje();
-
-    showToast(
-      tipo === "entrada" ? "✅" : "🏁",
-      tipo === "entrada"
-        ? `Entrada registrada · ${hora}`
-        : `Salida registrada · ${hora}`
-    );
-  });
-
-  /* ══════════════════════════════════
-     GEOLOCATION
-  ══════════════════════════════════ */
-  function initGeo() {
-    if (!navigator.geolocation) {
-      geoLabel.textContent = "Geolocalización no disponible";
-      geoStrip.className   = "geo-strip denied";
-      return;
-    }
-    geoLabel.textContent = "Solicitando ubicación…";
-    geoStrip.className   = "geo-strip";
-
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        geoCoords = pos.coords;
-        const lat = pos.coords.latitude.toFixed(5);
-        const lng = pos.coords.longitude.toFixed(5);
-        geoLabel.textContent = `${lat}, ${lng}`;
-        geoStrip.className   = "geo-strip ready";
-      },
-      () => {
-        geoLabel.textContent = "Ubicación no disponible — marcaje sin coordenadas";
-        geoStrip.className   = "geo-strip denied";
-      },
-      { timeout: 10000, maximumAge: 60000 }
-    );
-  }
-
-  /* ══════════════════════════════════
-     TOAST
-  ══════════════════════════════════ */
-  function showToast(icon, msg) {
-    clearTimeout(toastTimer);
-    document.getElementById("toast-ic").textContent  = icon;
-    document.getElementById("toast-msg").textContent = msg;
-    toastEl.classList.add("show");
-    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3600);
-  }
-
-  /* ══════════════════════════════════
-     VIEW HELPERS
-  ══════════════════════════════════ */
-  function mostrarVista(el) {
-    [vLogin, vDash, vLock].forEach(v => v.classList.remove("active"));
-    el.classList.add("active");
-  }
-
+  // ─────────────────────────────────────────
+  //  VISTAS
+  // ─────────────────────────────────────────
   function mostrarLogin() {
-    btnLogout.style.display = "none";
-    mostrarVista(vLogin);
+    viewLockout.style.display   = "none";
+    viewDashboard.style.display = "none";
+    viewLogin.style.display     = "block";
     pinInput.value = "";
-    setTimeout(() => pinInput.focus(), 80);
-    const data = getTry();
-    for (let i = 1; i <= MAX_TRY; i++) {
+    pinInput.focus();
+
+    // Restaurar dots según intentos previos
+    const data = getIntentos();
+    for (let i = 1; i <= MAX_INTENTOS; i++) {
       const d = document.getElementById("dot-" + i);
       if (d) d.classList.toggle("used", i <= data.count);
     }
   }
 
-  function mostrarDash(usuario) {
-    currentSesion = usuario;
-    btnLogout.style.display = "flex";
-    mostrarVista(vDash);
+  function mostrarDashboard(usuario) {
+    viewLogin.style.display     = "none";
+    viewLockout.style.display   = "none";
+    viewDashboard.style.display = "block";
 
-    // Avatar initials
-    const nombre   = usuario.nombre || "?";
-    const initials = nombre.split(" ").slice(0,2).map(w => w[0] || "").join("").toUpperCase();
-    document.getElementById("user-avatar").textContent  = initials || "?";
     document.getElementById("user-empresa").textContent = (usuario.nombreEmpresa || "").toUpperCase();
-    document.getElementById("user-nombre").textContent  = nombre;
-    document.getElementById("user-cargo").textContent   = usuario.cargo || "";
-
-    renderMarcaje();
-    initGeo();
+    document.getElementById("user-nombre").textContent  = usuario.nombre  || "—";
+    document.getElementById("user-cargo").textContent   = usuario.cargo   || "";
   }
 
-  /* ══════════════════════════════════
-     MISC HELPERS
-  ══════════════════════════════════ */
-  function showError(msg) {
-    errorBox.textContent   = msg;
-    errorBox.style.display = "block";
-    warnBox.style.display  = "none";
+  // ─────────────────────────────────────────
+  //  HELPERS
+  // ─────────────────────────────────────────
+  function mostrarError(msg) {
+    errorBox.textContent      = msg;
+    errorBox.style.display    = "block";
+    warnBox.style.display     = "none";
   }
 
-  function showWarn(msg) {
-    warnBox.textContent   = msg;
-    warnBox.style.display = "block";
+  function mostrarWarn(msg) {
+    warnBox.textContent    = msg;
+    warnBox.style.display  = "block";
   }
 
-  function clearMsgs() {
+  function ocultarMensajes() {
     errorBox.style.display = "none";
     warnBox.style.display  = "none";
   }
 
-  function setLoading(on) {
-    btnSubmit.disabled  = on;
-    btnSubmit.innerHTML = on
-      ? '<span class="spinner"></span> Validando…'
+  function setLoading(state) {
+    btnSubmit.disabled = state;
+    btnSubmit.innerHTML = state
+      ? '<span class="spinner"></span> Validando...'
       : 'Ingresar';
   }
 
-  function safeParse(s) { try { return JSON.parse(s); } catch { return null; } }
-  function pad(n) { return String(n).padStart(2, "0"); }
+  function safeParseJSON(str) {
+    try { return JSON.parse(str); } catch { return null; }
+  }
 </script>
 </body>
 </html>
