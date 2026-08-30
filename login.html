@@ -224,6 +224,111 @@
     .status-badge span { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 1.8s infinite; display: inline-block; }
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
+    /* ── Sede en tarjeta de usuario ── */
+    .user-card .sede {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* ── Timeline de marcaje ── */
+    .marcaje-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+    .marcaje-progreso {
+      background: #eef2ff;
+      color: var(--primary);
+      padding: 0.15rem 0.6rem;
+      border-radius: 99px;
+      font-size: 0.72rem;
+    }
+
+    .timeline { list-style: none; margin-bottom: 1.25rem; }
+    .timeline-step {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.55rem 0;
+      position: relative;
+    }
+    .timeline-step:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      left: 13px;
+      top: 34px;
+      width: 2px;
+      height: calc(100% - 12px);
+      background: var(--border);
+    }
+    .timeline-step.done:not(:last-child)::before { background: var(--success); }
+
+    .step-dot {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1;
+      transition: all 0.2s;
+    }
+    .step-check { display: none; color: white; font-size: 0.85rem; font-weight: 700; }
+
+    .timeline-step.done .step-dot { background: var(--success); border-color: var(--success); }
+    .timeline-step.done .step-check { display: block; }
+
+    .timeline-step.activo .step-dot {
+      border-color: var(--primary);
+      background: #eff6ff;
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+      animation: pulse-dot 1.8s infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{box-shadow:0 0 0 4px rgba(37,99,235,0.12)} 50%{box-shadow:0 0 0 7px rgba(37,99,235,0.06)} }
+
+    .step-info { flex: 1; }
+    .step-label { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .timeline-step:not(.done):not(.activo) .step-label { color: var(--text-muted); }
+    .step-time { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.1rem; }
+    .timeline-step.done .step-time { color: var(--success); font-weight: 600; }
+
+    /* ── Botón de marcaje (dinámico) ── */
+    .btn-marcar {
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 0.65rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(16,185,129,0.25);
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .btn-marcar:hover:not(:disabled) { background: #0d9c6f; }
+    .btn-marcar:active:not(:disabled) { transform: scale(0.98); }
+    .btn-marcar:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
+    .btn-marcar.completo { background: #64748b; }
+    .btn-marcar .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+
+    .msg.success { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+
     .btn-logout {
       width: 100%;
       padding: 0.75rem;
@@ -321,17 +426,57 @@
       <div class="company" id="user-empresa">—</div>
       <div class="name"    id="user-nombre">Cargando...</div>
       <div class="role"    id="user-cargo"></div>
+      <div class="sede"    id="user-sede"></div>
     </div>
 
-    <div style="text-align:center">
+    <!-- ── Timeline de marcaje del día ── -->
+    <div class="marcaje-header">
+      <span id="marcaje-fecha">—</span>
+      <span class="marcaje-progreso" id="marcaje-progreso">Cargando…</span>
+    </div>
+
+    <ul class="timeline" id="timeline">
+      <li class="timeline-step" data-tipo="ENTRADA">
+        <div class="step-dot"><span class="step-check">✓</span></div>
+        <div class="step-info">
+          <div class="step-label">Entrada</div>
+          <div class="step-time">—</div>
+        </div>
+      </li>
+      <li class="timeline-step" data-tipo="SALIDA_ALMUERZO">
+        <div class="step-dot"><span class="step-check">✓</span></div>
+        <div class="step-info">
+          <div class="step-label">Salida a almuerzo</div>
+          <div class="step-time">—</div>
+        </div>
+      </li>
+      <li class="timeline-step" data-tipo="REGRESO_ALMUERZO">
+        <div class="step-dot"><span class="step-check">✓</span></div>
+        <div class="step-info">
+          <div class="step-label">Regreso de almuerzo</div>
+          <div class="step-time">—</div>
+        </div>
+      </li>
+      <li class="timeline-step" data-tipo="SALIDA">
+        <div class="step-dot"><span class="step-check">✓</span></div>
+        <div class="step-info">
+          <div class="step-label">Salida</div>
+          <div class="step-time">—</div>
+        </div>
+      </li>
+    </ul>
+
+    <div id="marcaje-msg" class="msg"></div>
+
+    <button id="btn-marcar" class="btn-marcar" disabled>
+      <span id="btn-marcar-label">Cargando estado del día…</span>
+    </button>
+
+    <div style="text-align:center; margin: 1rem 0 1.25rem;">
       <span class="status-badge">
         <span></span> Sesión activa
       </span>
     </div>
-
-    <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; margin-bottom:1.5rem;">
-      Listo para integrar geolocalización y botones de marcación.
-    </p>
 
     <button id="btn-logout" class="btn-logout">Cerrar sesión</button>
   </div>
@@ -342,7 +487,7 @@
   // ─────────────────────────────────────────
   //  CONFIGURACIÓN
   // ─────────────────────────────────────────
-  const API_URL = "https://script.google.com/macros/s/AKfycbzF4VXoD2rU0iBjb5If39ZsT2GnGdaQawgATS3k8x7xqq2XvzZ7hOz-enu6l0m7IVvcnw/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbwWJqQV8fllucGVuxA0KX4OOjW6ypxBdwt7B1loTIlUuk8bBDootOKb5iEbVY1C_iXWkA/exec";
 
   const MAX_INTENTOS   = 5;       // bloqueo tras N fallos
   const BLOQUEO_SEG    = 5 * 60;  // duración del bloqueo en segundos (5 min)
@@ -545,9 +690,195 @@
     viewLockout.style.display   = "none";
     viewDashboard.style.display = "block";
 
+    usuarioActual = usuario;
+
     document.getElementById("user-empresa").textContent = (usuario.nombreEmpresa || "").toUpperCase();
     document.getElementById("user-nombre").textContent  = usuario.nombre  || "—";
     document.getElementById("user-cargo").textContent   = usuario.cargo   || "";
+    document.getElementById("user-sede").textContent    = usuario.nombreSede ? "📍 " + usuario.nombreSede : "";
+
+    const hoy = new Date();
+    document.getElementById("marcaje-fecha").textContent =
+      hoy.toLocaleDateString("es-GT", { weekday: "long", day: "numeric", month: "long" });
+
+    if (usuario.tipo === "EMPLEADO") {
+      cargarEstadoMarcaje();
+    } else {
+      // Los administradores no marcan asistencia propia en esta vista
+      document.querySelector(".marcaje-header").style.display = "none";
+      document.getElementById("timeline").style.display = "none";
+      document.getElementById("btn-marcar").style.display = "none";
+    }
+  }
+
+  // ─────────────────────────────────────────
+  //  MARCAJE — un marcaje por tipo, por día, en orden
+  // ─────────────────────────────────────────
+  let usuarioActual = null;
+
+  const TIPOS_ORDEN = ["ENTRADA", "SALIDA_ALMUERZO", "REGRESO_ALMUERZO", "SALIDA"];
+  const TIPOS_LABEL = {
+    ENTRADA:          "Entrada",
+    SALIDA_ALMUERZO:  "Salida a almuerzo",
+    REGRESO_ALMUERZO: "Regreso de almuerzo",
+    SALIDA:           "Salida"
+  };
+
+  const btnMarcar      = document.getElementById("btn-marcar");
+  const marcajeMsg     = document.getElementById("marcaje-msg");
+  const marcajeProgreso= document.getElementById("marcaje-progreso");
+
+  btnMarcar.addEventListener("click", () => marcarAsistencia());
+
+  async function cargarEstadoMarcaje() {
+    ocultarMarcajeMsg();
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "historial", token: usuarioActual.token, idEmpleado: usuarioActual.id })
+      });
+      const result = await response.json();
+
+      if (!result.success) {
+        mostrarMarcajeError(result.message || "No se pudo cargar tu estado de hoy.");
+        return;
+      }
+      pintarTimeline(result.marcaciones, result.proximoTipo, result.jornadaCompleta);
+
+    } catch (err) {
+      console.error(err);
+      mostrarMarcajeError("No se pudo conectar para revisar tu estado de hoy. Puedes intentar marcar de todas formas.");
+      // Sin datos del servidor, se asume el primer paso por seguridad
+      pintarTimeline([], "ENTRADA", false);
+    }
+  }
+
+  function pintarTimeline(marcaciones, proximoTipo, jornadaCompleta) {
+    const porTipo = {};
+    (marcaciones || []).forEach(m => { porTipo[m.tipo] = m; });
+
+    TIPOS_ORDEN.forEach(tipo => {
+      const li = document.querySelector('.timeline-step[data-tipo="' + tipo + '"]');
+      if (!li) return;
+      li.classList.remove("done", "activo");
+      const timeEl = li.querySelector(".step-time");
+
+      if (porTipo[tipo]) {
+        li.classList.add("done");
+        const dentro = porTipo[tipo].dentroGeovalla === true || porTipo[tipo].dentroGeovalla === "TRUE";
+        timeEl.textContent = porTipo[tipo].hora + (dentro ? "" : " · fuera de rango");
+      } else if (tipo === proximoTipo) {
+        li.classList.add("activo");
+        timeEl.textContent = "Pendiente";
+      } else {
+        timeEl.textContent = "—";
+      }
+    });
+
+    const hechos = (marcaciones || []).length;
+    marcajeProgreso.textContent = hechos + "/4";
+
+    if (jornadaCompleta) {
+      btnMarcar.disabled = true;
+      btnMarcar.classList.add("completo");
+      document.getElementById("btn-marcar-label").textContent = "✅ Jornada de hoy completa";
+    } else {
+      btnMarcar.disabled = false;
+      btnMarcar.classList.remove("completo");
+      btnMarcar.dataset.tipo = proximoTipo;
+      document.getElementById("btn-marcar-label").textContent = "📍 Marcar " + TIPOS_LABEL[proximoTipo];
+    }
+  }
+
+  function obtenerUbicacion() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Este navegador no soporta geolocalización."));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve(pos.coords),
+        (err) => {
+          let msg = "No se pudo obtener tu ubicación.";
+          if (err.code === err.PERMISSION_DENIED) msg = "Activa el permiso de ubicación en tu navegador para poder marcar.";
+          else if (err.code === err.POSITION_UNAVAILABLE) msg = "Tu ubicación no está disponible ahora mismo.";
+          else if (err.code === err.TIMEOUT) msg = "Se agotó el tiempo esperando tu ubicación. Intenta de nuevo.";
+          reject(new Error(msg));
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+  }
+
+  async function marcarAsistencia() {
+    const tipo = btnMarcar.dataset.tipo;
+    if (!tipo || btnMarcar.disabled) return;
+
+    ocultarMarcajeMsg();
+    setLoadingMarcar(true, "Obteniendo ubicación…");
+
+    try {
+      const coords = await obtenerUbicacion();
+
+      setLoadingMarcar(true, "Registrando marcaje…");
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "marcar",
+          token: usuarioActual.token,
+          idEmpleado: usuarioActual.id,
+          tipo: tipo,
+          latitud: coords.latitude,
+          longitud: coords.longitude,
+          precision: coords.accuracy,
+          dispositivo: navigator.userAgent
+        })
+      });
+      const result = await response.json();
+
+      if (!result.success) {
+        mostrarMarcajeError(result.message);
+        // Puede que el estado local esté desincronizado (p.ej. marcado desde otro dispositivo) — recargar la verdad del servidor
+        await cargarEstadoMarcaje();
+        return;
+      }
+
+      await cargarEstadoMarcaje();
+      mostrarMarcajeExito(result.mensaje +
+        (result.dentroGeovalla ? "" : " (a " + result.distancia + " m de tu sede, radio permitido " + result.radioSede + " m)"));
+
+    } catch (err) {
+      mostrarMarcajeError(err.message || "Error de conexión. Verifica tu internet e intenta de nuevo.");
+      console.error(err);
+    } finally {
+      setLoadingMarcar(false);
+    }
+  }
+
+  function setLoadingMarcar(state, texto) {
+    btnMarcar.disabled = state || btnMarcar.classList.contains("completo");
+    if (state) {
+      document.getElementById("btn-marcar-label").innerHTML = '<span class="spinner"></span> ' + texto;
+    }
+  }
+
+  function mostrarMarcajeError(msg) {
+    marcajeMsg.className = "msg error";
+    marcajeMsg.textContent = msg;
+    marcajeMsg.style.display = "block";
+  }
+
+  function mostrarMarcajeExito(msg) {
+    marcajeMsg.className = "msg success";
+    marcajeMsg.textContent = msg;
+    marcajeMsg.style.display = "block";
+  }
+
+  function ocultarMarcajeMsg() {
+    marcajeMsg.style.display = "none";
   }
 
   // ─────────────────────────────────────────
