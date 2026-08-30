@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time AZV — Panel de Administración</title>
+  <style>
+    :root {
+      --primary:      #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light:#eff6ff;
+      --bg:           #f1f5f9;
+      --sidebar-bg:   #0f172a;
+      --sidebar-text: #94a3b8;
+      --sidebar-hover:#1e293b;
+      --sidebar-active:#1e40af;
+      --card-bg:      #ffffff;
+      --text:         #0f172a;
+      --text-muted:   #64748b;
+      --danger:       #ef4444;
+      --danger-light: #fef2f2;
+      --success:      #10b981;
+      --success-light:#ecfdf5;
+      --warning:      #f59e0b;
+      --warning-light:#fffbeb;
+      --border:       #e2e8f0;
+      --sidebar-w:    240px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+
+    body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform 0.25s;
+    }
+
+    .sidebar-logo {
+      padding: 1.5rem 1.25rem 1rem;
+      border-bottom: 1px solid #1e293b;
+    }
+    .logo-row { display: flex; align-items: center; gap: 0.6rem; }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: var(--primary);
+      border-radius: 0.5rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-icon svg { width: 18px; height: 18px; fill: white; }
+    .logo-name { font-size: 1rem; font-weight: 700; color: #f8fafc; letter-spacing: -0.5px; }
+    .logo-badge {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em;
+      background: #1d4ed8; color: #bfdbfe;
+      padding: 0.15rem 0.45rem; border-radius: 99px;
+      margin-top: 0.3rem; display: inline-block;
+    }
+
+    .sidebar-user {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid #1e293b;
+    }
+    .sidebar-user .su-name { font-size: 0.85rem; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-user .su-role { font-size: 0.72rem; color: var(--sidebar-text); margin-top: 0.1rem; }
+    .sidebar-user .su-empresa { font-size: 0.7rem; color: #3b82f6; margin-top: 0.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .sidebar-nav { flex: 1; padding: 0.75rem 0.75rem; overflow-y: auto; }
+    .nav-section-label {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+      color: #475569; text-transform: uppercase;
+      padding: 0.75rem 0.5rem 0.35rem;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 0.65rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.875rem; font-weight: 500;
+      color: var(--sidebar-text);
+      transition: background 0.15s, color 0.15s;
+      border: none; background: none; width: 100%; text-align: left;
+      margin-bottom: 0.1rem;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: #e2e8f0; }
+    .nav-item.active { background: var(--sidebar-active); color: #bfdbfe; }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-item .badge {
+      margin-left: auto; background: #1d4ed8; color: #bfdbfe;
+      font-size: 0.65rem; font-weight: 700;
+      padding: 0.1rem 0.45rem; border-radius: 99px;
+    }
+
+    .sidebar-footer {
+      padding: 0.75rem;
+      border-top: 1px solid #1e293b;
+    }
+    .btn-logout-sidebar {
+      width: 100%; display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.6rem 0.75rem; border-radius: 0.5rem;
+      background: none; border: none; cursor: pointer;
+      font-size: 0.85rem; color: #ef4444; transition: background 0.15s;
+    }
+    .btn-logout-sidebar:hover { background: rgba(239,68,68,0.1); }
+    .btn-logout-sidebar svg { width: 16px; height: 16px; }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+    .topbar-clock { font-size: 0.8rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+    .content { padding: 1.5rem; flex: 1; }
+
+    /* ── SECTION VIEWS ── */
+    .section-view { display: none; }
+    .section-view.active { display: block; }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+    }
+    .stat-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; }
+    .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--text); line-height: 1; }
+    .stat-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .stat-card.green .stat-value { color: var(--success); }
+    .stat-card.blue  .stat-value { color: var(--primary); }
+    .stat-card.amber .stat-value { color: var(--warning); }
+
+    /* ── PANEL / CARD ── */
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .panel-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+    .panel-body { padding: 1.25rem; }
+
+    /* ── BUTTON STYLES ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; border: none;
+      transition: background 0.15s, box-shadow 0.15s;
+      text-decoration: none;
+    }
+    .btn svg { width: 14px; height: 14px; }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 2px 6px rgba(37,99,235,0.25); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.75rem; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── TABLE ── */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    thead th {
+      text-align: left; padding: 0.6rem 1rem;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      background: #f8fafc;
+    }
+    tbody td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--text);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #f8fafc; }
+
+    /* ── BADGES ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-size: 0.7rem; font-weight: 700;
+      padding: 0.2rem 0.55rem; border-radius: 99px;
+    }
+    .badge-green  { background: var(--success-light); color: #047857; }
+    .badge-red    { background: var(--danger-light);  color: #b91c1c; }
+    .badge-amber  { background: var(--warning-light); color: #92400e; }
+    .badge-blue   { background: var(--primary-light); color: #1d4ed8; }
+    .badge-gray   { background: #f1f5f9; color: var(--text-muted); }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+    .badge-green  .badge-dot { background: var(--success); }
+    .badge-red    .badge-dot { background: var(--danger); }
+    .badge-amber  .badge-dot { background: var(--warning); }
+
+    /* ── SEARCH & FILTER BAR ── */
+    .toolbar {
+      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+    }
+    .search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 320px; }
+    .search-wrap svg { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); }
+    .search-input {
+      width: 100%; padding: 0.55rem 0.75rem 0.55rem 2.1rem;
+      border: 1.5px solid var(--border); border-radius: 0.5rem;
+      font-size: 0.82rem; color: var(--text); background: #f8fafc;
+      transition: border-color 0.15s;
+    }
+    .search-input:focus { outline: none; border-color: var(--primary); background: white; }
+
+    select.filter-select {
+      padding: 0.55rem 0.75rem;
+      border: 1.5px solid var(--border); border-radius: 0.5rem;
+      font-size: 0.82rem; color: var(--text); background: #f8fafc;
+      cursor: pointer;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+      display: none;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card-bg);
+      border-radius: 0.85rem;
+      width: 100%; max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal-header {
+      padding: 1.25rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title { font-size: 1rem; font-weight: 700; }
+    .modal-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); display: flex; align-items: center;
+      padding: 0.25rem; border-radius: 0.35rem;
+    }
+    .modal-close:hover { background: var(--bg); color: var(--text); }
+    .modal-close svg { width: 18px; height: 18px; }
+    .modal-body { padding: 1.25rem 1.5rem; }
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; gap: 0.75rem; justify-content: flex-end;
+    }
+
+    /* ── FORM ── */
+    .form-row { margin-bottom: 1rem; }
+    .form-row label {
+      display: block; font-size: 0.75rem; font-weight: 700;
+      color: var(--text-muted); letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+    }
+    .form-row input, .form-row select, .form-row textarea {
+      width: 100%; padding: 0.65rem 0.85rem;
+      border: 1.5px solid var(--border); border-radius: 0.5rem;
+      font-size: 0.875rem; color: var(--text); background: #f8fafc;
+      transition: border-color 0.15s;
+    }
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+      outline: none; border-color: var(--primary); background: white;
+    }
+    .form-row textarea { resize: vertical; min-height: 80px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .form-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+    /* ── SPINNER ── */
+    .spinner-sm {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOAST ── */
+    .toast-container {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      z-index: 999; display: flex; flex-direction: column; gap: 0.5rem;
+      pointer-events: none;
+    }
+    .toast {
+      background: var(--text); color: #f8fafc;
+      padding: 0.75rem 1rem; border-radius: 0.6rem;
+      font-size: 0.82rem; max-width: 320px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      animation: slideUp 0.2s ease;
+      display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .toast.success { background: #064e3b; border-left: 3px solid var(--success); }
+    .toast.error   { background: #7f1d1d; border-left: 3px solid var(--danger); }
+    .toast.warning { background: #451a03; border-left: 3px solid var(--warning); }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center; padding: 3rem 1.5rem;
+      color: var(--text-muted);
+    }
+    .empty-state svg { width: 40px; height: 40px; margin-bottom: 1rem; opacity: 0.35; }
+    .empty-state p { font-size: 0.875rem; }
+
+    /* ── TABS ── */
+    .tabs { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--border); margin-bottom: 1.25rem; }
+    .tab-btn {
+      padding: 0.6rem 1rem; border: none; background: none;
+      font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      color: var(--text-muted); border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: all 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* ── AVATAR ── */
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--primary-light); color: var(--primary);
+      font-size: 0.75rem; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .avatar-cell { display: flex; align-items: center; gap: 0.6rem; }
+    .avatar-cell .av-name { font-weight: 600; }
+    .avatar-cell .av-sub  { font-size: 0.72rem; color: var(--text-muted); }
+
+    /* ── LOADING OVERLAY ── */
+    .loading-overlay {
+      display: none; position: absolute; inset: 0;
+      background: rgba(255,255,255,0.7);
+      border-radius: inherit;
+      align-items: center; justify-content: center;
+      z-index: 10;
+    }
+    .loading-overlay.show { display: flex; }
+    .spinner-lg {
+      width: 32px; height: 32px;
+      border: 3px solid #e2e8f0; border-top-color: var(--primary);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+
+    /* ── RESPONSIVE ── */
+    .hamburger {
+      display: none; background: none; border: none;
+      cursor: pointer; padding: 0.35rem;
+      color: var(--text); border-radius: 0.35rem;
+    }
+    .hamburger svg { width: 22px; height: 22px; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .hamburger { display: flex; }
+      .sidebar-overlay.open { display: block; }
+      .form-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── INLINE ALERT ── */
+    .alert {
+      padding: 0.75rem 1rem; border-radius: 0.5rem;
+      font-size: 0.82rem; margin-bottom: 1rem;
+      display: flex; gap: 0.5rem; align-items: flex-start;
+    }
+    .alert svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 0.05rem; }
+    .alert-info { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .alert-warn { background: var(--warning-light); color: #92400e; border: 1px solid #fde68a; }
+
+    /* ── REPORT FILTERS ── */
+    .report-bar {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+      align-items: flex-end; margin-bottom: 1.25rem;
+    }
+    .report-bar .form-row { margin-bottom: 0; }
+    .report-bar .form-row label { margin-bottom: 0.25rem; }
+    .report-bar input, .report-bar select { padding: 0.5rem 0.75rem; }
+
+    /* ── MAP PREVIEW (static placeholder) ── */
+    .map-preview {
+      background: #e2e8f0;
+      border-radius: 0.5rem;
+      height: 120px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); font-size: 0.8rem; gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═════════════════════════════════════════
+     SIDEBAR
+═════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </div>
+      <span class="logo-name">Time AZV</span>
+    </div>
+    <span class="logo-badge">ADMIN</span>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="su-name" id="sb-nombre">—</div>
+    <div class="su-role" id="sb-rol">—</div>
+    <div class="su-empresa" id="sb-empresa">—</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Panel</div>
+    <button class="nav-item active" data-section="dashboard" onclick="irA('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Resumen
+    </button>
+
+    <div class="nav-section-label">Organización</div>
+    <button class="nav-item" id="nav-empresas" data-section="empresas" onclick="irA('empresas')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Empresas
+    </button>
+    <button class="nav-item" data-section="sedes" onclick="irA('sedes')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Sedes
+    </button>
+    <button class="nav-item" data-section="empleados" onclick="irA('empleados')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Empleados
+    </button>
+
+    <div class="nav-section-label">Reportes</div>
+    <button class="nav-item" data-section="marcaciones" onclick="irA('marcaciones')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Marcaciones
+    </button>
+    <button class="nav-item" data-section="auditoria" onclick="irA('auditoria')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+      Auditoría
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="btn-logout-sidebar" onclick="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Cerrar sesión
+    </button>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="cerrarSidebar()"></div>
+
+<!-- ═════════════════════════════════════════
+     MAIN
+═════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <button class="hamburger" onclick="abrirSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar-title" id="topbar-title">Resumen</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-clock" id="topbar-clock">—</span>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ══════ SECCIÓN: DASHBOARD / RESUMEN ══════ -->
+    <div class="section-view active" id="sec-dashboard">
+      <div class="stats-row" id="stats-row">
+        <div class="stat-card blue">
+          <div class="stat-label">Empresas</div>
+          <div class="stat-value" id="st-empresas">—</div>
+          <div class="stat-sub">activas en el sistema</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Sedes</div>
+          <div class="stat-value" id="st-sedes">—</div>
+          <div class="stat-sub">geovallas configuradas</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Empleados</div>
+          <div class="stat-value" id="st-empleados">—</div>
+          <div class="stat-sub">cuentas activas</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Marcaciones hoy</div>
+          <div class="stat-value" id="st-marcaciones">—</div>
+          <div class="stat-sub" id="st-marcaciones-sub">—</div>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div>Los datos de resumen se consultan desde Google Sheets en tiempo real. Las cifras se actualizan cada vez que recargas esta sección.</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Últimas marcaciones del día</span>
+          <button class="btn btn-secondary btn-sm" onclick="cargarDashboard()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23,4 23,11 16,11"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 11"/></svg>
+            Actualizar
+          </button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Empleado</th>
+                <th>Empresa</th>
+                <th>Tipo</th>
+                <th>Hora</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-recientes">
+              <tr><td colspan="5"><div class="empty-state"><p>Cargando…</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SECCIÓN: EMPRESAS ══════ -->
+    <div class="section-view" id="sec-empresas">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="search-input" id="emp-search" placeholder="Buscar empresa…" oninput="filtrarEmpresas()">
+            </div>
+            <select class="filter-select" id="emp-estado-filter" onchange="filtrarEmpresas()">
+              <option value="">Todos los estados</option>
+              <option value="ACTIVO">Activo</option>
+              <option value="INACTIVO">Inactivo</option>
+              <option value="SUSPENDIDO">Suspendido</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalEmpresa()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nueva empresa
+          </button>
+        </div>
+        <div class="tbl-wrap" style="position:relative">
+          <div class="loading-overlay" id="loading-empresas"><div class="spinner-lg"></div></div>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Empresa</th>
+                <th>Contacto</th>
+                <th>Sedes</th>
+                <th>Empleados</th>
+                <th>Plan</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbl-empresas">
+              <tr><td colspan="8"><div class="empty-state"><p>Cargando empresas…</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SECCIÓN: SEDES ══════ -->
+    <div class="section-view" id="sec-sedes">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="search-input" id="sede-search" placeholder="Buscar sede…" oninput="filtrarSedes()">
+            </div>
+            <select class="filter-select" id="sede-empresa-filter" onchange="filtrarSedes()">
+              <option value="">Todas las empresas</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalSede()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nueva sede
+          </button>
+        </div>
+        <div class="tbl-wrap" style="position:relative">
+          <div class="loading-overlay" id="loading-sedes"><div class="spinner-lg"></div></div>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Sede</th>
+                <th>Empresa</th>
+                <th>Coordenadas</th>
+                <th>Radio</th>
+                <th>Horario</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbl-sedes">
+              <tr><td colspan="8"><div class="empty-state"><p>Cargando sedes…</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SECCIÓN: EMPLEADOS ══════ -->
+    <div class="section-view" id="sec-empleados">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="search-input" id="empl-search" placeholder="Nombre, cargo, PIN…" oninput="filtrarEmpleados()">
+            </div>
+            <select class="filter-select" id="empl-empresa-filter" onchange="filtrarEmpleados()">
+              <option value="">Todas las empresas</option>
+            </select>
+            <select class="filter-select" id="empl-estado-filter" onchange="filtrarEmpleados()">
+              <option value="">Todos los estados</option>
+              <option value="ACTIVO">Activo</option>
+              <option value="INACTIVO">Inactivo</option>
+              <option value="SUSPENDIDO">Suspendido</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalEmpleado()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nuevo empleado
+          </button>
+        </div>
+        <div class="tbl-wrap" style="position:relative">
+          <div class="loading-overlay" id="loading-empleados"><div class="spinner-lg"></div></div>
+          <table>
+            <thead>
+              <tr>
+                <th>Empleado</th>
+                <th>Empresa / Sede</th>
+                <th>Cargo</th>
+                <th>Jornada</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbl-empleados">
+              <tr><td colspan="6"><div class="empty-state"><p>Cargando empleados…</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SECCIÓN: MARCACIONES ══════ -->
+    <div class="section-view" id="sec-marcaciones">
+      <div class="report-bar">
+        <div class="form-row">
+          <label>Fecha inicio</label>
+          <input type="date" id="rep-fecha-ini" style="width:auto">
+        </div>
+        <div class="form-row">
+          <label>Fecha fin</label>
+          <input type="date" id="rep-fecha-fin" style="width:auto">
+        </div>
+        <div class="form-row">
+          <label>Empresa</label>
+          <select class="filter-select" id="rep-empresa-filter">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Tipo</label>
+          <select class="filter-select" id="rep-tipo-filter">
+            <option value="">Todos</option>
+            <option value="ENTRADA">Entrada</option>
+            <option value="SALIDA_ALMUERZO">Salida almuerzo</option>
+            <option value="REGRESO_ALMUERZO">Regreso almuerzo</option>
+            <option value="SALIDA">Salida</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="cargarMarcaciones()" style="margin-top:auto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Consultar
+        </button>
+        <button class="btn btn-secondary" onclick="exportarCSV()" style="margin-top:auto" id="btn-export" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar CSV
+        </button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header" style="flex-wrap:wrap;gap:.5rem">
+          <span class="panel-title">Resultado</span>
+          <span id="rep-count" class="badge badge-blue">— registros</span>
+        </div>
+        <div class="tbl-wrap" style="position:relative">
+          <div class="loading-overlay" id="loading-marcaciones"><div class="spinner-lg"></div></div>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Empleado</th>
+                <th>Empresa / Sede</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Distancia</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-marcaciones">
+              <tr><td colspan="8">
+                <div class="empty-state">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <p>Selecciona un rango de fechas y presiona Consultar.</p>
+                </div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SECCIÓN: AUDITORÍA ══════ -->
+    <div class="section-view" id="sec-auditoria">
+      <div class="report-bar">
+        <div class="form-row">
+          <label>Fecha</label>
+          <input type="date" id="aud-fecha" style="width:auto">
+        </div>
+        <div class="form-row">
+          <label>Acción</label>
+          <select class="filter-select" id="aud-accion">
+            <option value="">Todas</option>
+            <option value="LOGIN">Login</option>
+            <option value="LOGIN_DENEGADO">Login denegado</option>
+            <option value="MARCACION">Marcación</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="cargarAuditoria()" style="margin-top:auto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Consultar
+        </button>
+      </div>
+
+      <div class="panel">
+        <div class="tbl-wrap" style="position:relative">
+          <div class="loading-overlay" id="loading-auditoria"><div class="spinner-lg"></div></div>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Timestamp</th>
+                <th>Usuario</th>
+                <th>Tipo</th>
+                <th>Acción</th>
+                <th>Detalle</th>
+                <th>Resultado</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-auditoria">
+              <tr><td colspan="7">
+                <div class="empty-state">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                  <p>Selecciona una fecha y presiona Consultar.</p>
+                </div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ══════════════════════════════════════════
+     MODALES
+══════════════════════════════════════════ -->
+
+<!-- Modal Empresa -->
+<div class="modal-overlay" id="modal-empresa">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-empresa-title">Nueva empresa</span>
+      <button class="modal-close" onclick="cerrarModal('modal-empresa')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-row">
+          <label>ID de Empresa *</label>
+          <input type="text" id="emp-id" placeholder="EMP-001">
+          <div class="form-hint">Identificador único. No se puede cambiar después.</div>
+        </div>
+        <div class="form-row">
+          <label>Plan</label>
+          <select id="emp-plan">
+            <option value="BASICO">Básico</option>
+            <option value="PRO" selected>Pro</option>
+            <option value="ENTERPRISE">Enterprise</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Nombre de la empresa *</label>
+        <input type="text" id="emp-nombre" placeholder="Acme Corporation S.A.">
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Nombre de contacto</label>
+          <input type="text" id="emp-contacto" placeholder="Juan García">
+        </div>
+        <div class="form-row">
+          <label>Email de contacto</label>
+          <input type="email" id="emp-email" placeholder="contacto@empresa.com">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Teléfono</label>
+          <input type="tel" id="emp-telefono" placeholder="+502 1234-5678">
+        </div>
+        <div class="form-row">
+          <label>Estado</label>
+          <select id="emp-estado">
+            <option value="ACTIVO">Activo</option>
+            <option value="INACTIVO">Inactivo</option>
+            <option value="SUSPENDIDO">Suspendido</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Dirección</label>
+        <input type="text" id="emp-direccion" placeholder="Ciudad de Guatemala">
+      </div>
+      <input type="hidden" id="emp-editando">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-empresa')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-guardar-empresa" onclick="guardarEmpresa()">
+        Guardar empresa
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Sede -->
+<div class="modal-overlay" id="modal-sede">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-sede-title">Nueva sede</span>
+      <button class="modal-close" onclick="cerrarModal('modal-sede')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-row">
+          <label>ID de Sede *</label>
+          <input type="text" id="sed-id" placeholder="SEDE-001">
+        </div>
+        <div class="form-row">
+          <label>Empresa *</label>
+          <select id="sed-empresa">
+            <option value="">— Selecciona —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Nombre de la sede *</label>
+        <input type="text" id="sed-nombre" placeholder="Oficina Central">
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Latitud *</label>
+          <input type="number" id="sed-lat" placeholder="14.6349" step="any">
+        </div>
+        <div class="form-row">
+          <label>Longitud *</label>
+          <input type="number" id="sed-lon" placeholder="-90.5069" step="any">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Radio de geovalla (metros) *</label>
+          <input type="number" id="sed-radio" value="150" min="10" max="5000">
+          <div class="form-hint">Distancia máxima permitida desde la sede.</div>
+        </div>
+        <div class="form-row">
+          <label>Estado</label>
+          <select id="sed-estado">
+            <option value="ACTIVO">Activo</option>
+            <option value="INACTIVO">Inactivo</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Horario inicio</label>
+          <input type="time" id="sed-horario-ini" value="07:00">
+        </div>
+        <div class="form-row">
+          <label>Horario fin</label>
+          <input type="time" id="sed-horario-fin" value="20:00">
+        </div>
+      </div>
+      <div class="map-preview" id="map-preview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Ingresa las coordenadas para previsualizar en el mapa
+      </div>
+      <input type="hidden" id="sed-editando">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-sede')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarSede()">Guardar sede</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Empleado -->
+<div class="modal-overlay" id="modal-empleado">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-empleado-title">Nuevo empleado</span>
+      <button class="modal-close" onclick="cerrarModal('modal-empleado')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-row">
+          <label>ID de Empleado *</label>
+          <input type="text" id="empl-id" placeholder="EMP-001">
+        </div>
+        <div class="form-row">
+          <label>PIN de acceso *</label>
+          <input type="text" id="empl-pin" placeholder="••••" maxlength="8" inputmode="numeric">
+          <div class="form-hint">4–8 dígitos numéricos.</div>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Nombres *</label>
+          <input type="text" id="empl-nombres" placeholder="Juan Carlos">
+        </div>
+        <div class="form-row">
+          <label>Apellidos *</label>
+          <input type="text" id="empl-apellidos" placeholder="García López">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Email</label>
+          <input type="email" id="empl-email" placeholder="juan@empresa.com">
+        </div>
+        <div class="form-row">
+          <label>Teléfono</label>
+          <input type="tel" id="empl-telefono" placeholder="+502 1234-5678">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Empresa *</label>
+          <select id="empl-empresa" onchange="actualizarSedesFiltro('empl-empresa','empl-sede')">
+            <option value="">— Selecciona —</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Sede *</label>
+          <select id="empl-sede">
+            <option value="">— Selecciona empresa —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Cargo</label>
+          <input type="text" id="empl-cargo" placeholder="Analista de sistemas">
+        </div>
+        <div class="form-row">
+          <label>Departamento</label>
+          <input type="text" id="empl-departamento" placeholder="TI">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Jornada</label>
+          <select id="empl-jornada">
+            <option value="DIURNA">Diurna</option>
+            <option value="NOCTURNA">Nocturna</option>
+            <option value="MIXTA">Mixta</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Estado</label>
+          <select id="empl-estado">
+            <option value="ACTIVO">Activo</option>
+            <option value="INACTIVO">Inactivo</option>
+            <option value="SUSPENDIDO">Suspendido</option>
+          </select>
+        </div>
+      </div>
+      <input type="hidden" id="empl-editando">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-empleado')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEmpleado()">Guardar empleado</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmar Eliminar -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <span class="modal-title">Confirmar acción</span>
+      <button class="modal-close" onclick="cerrarModal('modal-confirm')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p id="confirm-msg" style="font-size:0.9rem;color:var(--text-muted);line-height:1.5">¿Estás seguro?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-confirm')">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirm-ok">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ═════════════════════════════════════════
+     JAVASCRIPT
+═════════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────
+//  CONFIG
+// ──────────────────────────────────────────
+const API_URL     = "https://script.google.com/macros/s/AKfycbwWJqQV8fllucGVuxA0KX4OOjW6ypxBdwt7B1loTIlUuk8bBDootOKb5iEbVY1C_iXWkA/exec";
+const STORAGE_KEY = "sesion_asistencia";
+
+// ──────────────────────────────────────────
+//  STATE
+// ──────────────────────────────────────────
+let sesion       = null;
+let listaEmpresas  = [];
+let listaSedes     = [];
+let listaEmpleados = [];
+let listaMarcaciones = [];
+let tablaEmpresas  = [];
+let tablaSedes     = [];
+let tablaEmpleados = [];
+
+// ──────────────────────────────────────────
+//  INIT
+// ──────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  sesion = safeParseJSON(localStorage.getItem(STORAGE_KEY));
+
+  if (!sesion || sesion.tipo !== "ADMIN") {
+    toast("Sesión no válida. Redirigiendo…", "error");
+    setTimeout(() => { location.href = "login.html"; }, 1800);
+    return;
+  }
+
+  // Poblar sidebar
+  document.getElementById("sb-nombre").textContent  = sesion.nombre  || "—";
+  document.getElementById("sb-rol").textContent     = sesion.rol     || "Administrador";
+  document.getElementById("sb-empresa").textContent = sesion.nombreEmpresa || "Super Admin";
+
+  // Reloj
+  actualizarReloj();
+  setInterval(actualizarReloj, 1000);
+
+  // Fechas por defecto en reportes
+  const hoy  = fechaHoy();
+  document.getElementById("rep-fecha-ini").value = hoy;
+  document.getElementById("rep-fecha-fin").value  = hoy;
+  document.getElementById("aud-fecha").value       = hoy;
+
+  // Cargar datos iniciales
+  cargarTodasLasListas().then(() => cargarDashboard());
+
+  // Mapa preview en modal sede
+  ["sed-lat", "sed-lon"].forEach(id => {
+    document.getElementById(id).addEventListener("input", actualizarMapaPreview);
+  });
+});
+
+// ──────────────────────────────────────────
+//  RELOJ
+// ──────────────────────────────────────────
+function actualizarReloj() {
+  const now = new Date();
+  document.getElementById("topbar-clock").textContent =
+    now.toLocaleTimeString("es-GT", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) +
+    " · " +
+    now.toLocaleDateString("es-GT", { weekday:"short", day:"numeric", month:"short" });
+}
+
+// ──────────────────────────────────────────
+//  NAVEGACIÓN
+// ──────────────────────────────────────────
+const SECTION_TITLES = {
+  dashboard:  "Resumen",
+  empresas:   "Empresas",
+  sedes:      "Sedes",
+  empleados:  "Empleados",
+  marcaciones:"Marcaciones",
+  auditoria:  "Auditoría",
+};
+
+function irA(seccion) {
+  document.querySelectorAll(".section-view").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+
+  document.getElementById("sec-" + seccion).classList.add("active");
+  document.querySelector('.nav-item[data-section="' + seccion + '"]').classList.add("active");
+  document.getElementById("topbar-title").textContent = SECTION_TITLES[seccion] || seccion;
+
+  cerrarSidebar();
+
+  // Refresh on navigate
+  if (seccion === "dashboard")  cargarDashboard();
+  if (seccion === "empresas")   renderizarEmpresas();
+  if (seccion === "sedes")      renderizarSedes();
+  if (seccion === "empleados")  renderizarEmpleados();
+}
+
+// ──────────────────────────────────────────
+//  SIDEBAR MOBILE
+// ──────────────────────────────────────────
+function abrirSidebar()  { document.getElementById("sidebar").classList.add("open"); document.getElementById("sidebar-overlay").classList.add("open"); }
+function cerrarSidebar() { document.getElementById("sidebar").classList.remove("open"); document.getElementById("sidebar-overlay").classList.remove("open"); }
+
+// ──────────────────────────────────────────
+//  API HELPER
+// ──────────────────────────────────────────
+async function api(action, body = {}) {
+  const payload = { action, token: sesion.token, idAdmin: sesion.id, ...body };
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+// ──────────────────────────────────────────
+//  CARGA INICIAL DE LISTAS (desde la hoja)
+//  Por ahora lee desde el backend con acciones de admin.
+//  Si la acción aún no existe, muestra demo data.
+// ──────────────────────────────────────────
+async function cargarTodasLasListas() {
+  const [rEmp, rSed, rEmpl] = await Promise.allSettled([
+    api("adminListarEmpresas"),
+    api("adminListarSedes"),
+    api("adminListarEmpleados"),
+  ]);
+
+  // Empresas
+  if (rEmp.status === "fulfilled" && rEmp.value.success) {
+    listaEmpresas = rEmp.value.empresas || [];
+  } else {
+    // Demo data mientras el backend no tenga estas acciones
+    listaEmpresas = demoDatos("empresas");
+  }
+
+  // Sedes
+  if (rSed.status === "fulfilled" && rSed.value.success) {
+    listaSedes = rSed.value.sedes || [];
+  } else {
+    listaSedes = demoDatos("sedes");
+  }
+
+  // Empleados
+  if (rEmpl.status === "fulfilled" && rEmpl.value.success) {
+    listaEmpleados = rEmpl.value.empleados || [];
+  } else {
+    listaEmpleados = demoDatos("empleados");
+  }
+
+  tablaEmpresas  = [...listaEmpresas];
+  tablaSedes     = [...listaSedes];
+  tablaEmpleados = [...listaEmpleados];
+
+  poblarSelectsEmpresa();
+}
+
+// ──────────────────────────────────────────
+//  DEMO DATA (mientras el backend se construye)
+// ──────────────────────────────────────────
+function demoDatos(tipo) {
+  if (tipo === "empresas") return [
+    { id:"EMP-001", nombre:"Azyvion Tech", contacto:"Hector Reyes", email:"hector@azyvion.com", telefono:"+502 9999-0000", plan:"PRO",     estado:"ACTIVO",   sedes:2, empleados:12 },
+    { id:"EMP-002", nombre:"Corp Logística",contacto:"Ana Morales", email:"ana@corplog.com",    telefono:"+502 8888-1111", plan:"BASICO",  estado:"ACTIVO",   sedes:1, empleados:5  },
+    { id:"EMP-003", nombre:"Distribuidora X",contacto:"Pedro Gil",  email:"pedro@distx.com",   telefono:"+502 7777-2222", plan:"ENTERPRISE",estado:"INACTIVO",sedes:3, empleados:0  },
+  ];
+  if (tipo === "sedes") return [
+    { id:"SEDE-001", idEmpresa:"EMP-001", nombre:"Oficina Central",   latitud:14.6349, longitud:-90.5069, radio:150, horarioInicio:"07:00", horarioFin:"19:00", estado:"ACTIVO"   },
+    { id:"SEDE-002", idEmpresa:"EMP-001", nombre:"Bodega Norte",      latitud:14.6601, longitud:-90.5123, radio:200, horarioInicio:"06:00", horarioFin:"18:00", estado:"ACTIVO"   },
+    { id:"SEDE-003", idEmpresa:"EMP-002", nombre:"Sucursal Zona 10",  latitud:14.6015, longitud:-90.5068, radio:100, horarioInicio:"08:00", horarioFin:"20:00", estado:"ACTIVO"   },
+  ];
+  if (tipo === "empleados") return [
+    { id:"E-001", nombres:"Carlos",  apellidos:"Ramírez", email:"carlos@azyvion.com",  idEmpresa:"EMP-001", idSede:"SEDE-001", cargo:"Desarrollador",   departamento:"TI",       jornada:"DIURNA",  estado:"ACTIVO"    },
+    { id:"E-002", nombres:"María",   apellidos:"Pérez",   email:"maria@azyvion.com",   idEmpresa:"EMP-001", idSede:"SEDE-001", cargo:"Diseñadora",       departamento:"Diseño",   jornada:"DIURNA",  estado:"ACTIVO"    },
+    { id:"E-003", nombres:"Juan",    apellidos:"García",  email:"juan@corplog.com",    idEmpresa:"EMP-002", idSede:"SEDE-003", cargo:"Repartidor",       departamento:"Logística",jornada:"DIURNA",  estado:"ACTIVO"    },
+    { id:"E-004", nombres:"Sofía",   apellidos:"Torres",  email:"sofia@azyvion.com",   idEmpresa:"EMP-001", idSede:"SEDE-002", cargo:"Admin. Almacén",   departamento:"Bodega",   jornada:"MIXTA",   estado:"SUSPENDIDO"},
+  ];
+  return [];
+}
+
+// ──────────────────────────────────────────
+//  POBLAR SELECTS DE EMPRESA
+// ──────────────────────────────────────────
+function poblarSelectsEmpresa() {
+  const selects = ["sede-empresa-filter","empl-empresa-filter","rep-empresa-filter",
+                   "sed-empresa","empl-empresa"];
+  selects.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const val = el.value;
+    // conservar solo el primer option (placeholder)
+    while (el.options.length > 1) el.remove(1);
+    listaEmpresas.forEach(e => {
+      const opt = document.createElement("option");
+      opt.value = e.id; opt.textContent = e.nombre;
+      el.appendChild(opt);
+    });
+    if (val) el.value = val;
+  });
+}
+
+function actualizarSedesFiltro(empSelectId, sedSelectId) {
+  const idEmp = document.getElementById(empSelectId).value;
+  const el = document.getElementById(sedSelectId);
+  while (el.options.length > 1) el.remove(1);
+  listaSedes.filter(s => !idEmp || s.idEmpresa === idEmp).forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.id; opt.textContent = s.nombre;
+    el.appendChild(opt);
+  });
+}
+
+// ──────────────────────────────────────────
+//  DASHBOARD
+// ──────────────────────────────────────────
+async function cargarDashboard() {
+  document.getElementById("st-empresas").textContent  = listaEmpresas.filter(e=>e.estado==="ACTIVO").length;
+  document.getElementById("st-sedes").textContent     = listaSedes.filter(s=>s.estado==="ACTIVO").length;
+  document.getElementById("st-empleados").textContent = listaEmpleados.filter(e=>e.estado==="ACTIVO").length;
+
+  // Marcaciones de hoy — si el backend lo soporta
+  const hoy = fechaHoy();
+  document.getElementById("st-marcaciones").textContent = "—";
+  document.getElementById("st-marcaciones-sub").textContent = "consultando…";
+
+  try {
+    const r = await api("adminMarcacionesPorFecha", { fecha: hoy });
+    if (r.success) {
+      const marcas = r.marcaciones || [];
+      document.getElementById("st-marcaciones").textContent = marcas.length;
+      document.getElementById("st-marcaciones-sub").textContent = "registros del " + hoy;
+      renderizarRecientes(marcas.slice(-10).reverse());
+    } else {
+      renderizarRecientesMock();
+    }
+  } catch { renderizarRecientesMock(); }
+}
+
+function renderizarRecientesMock() {
+  document.getElementById("st-marcaciones").textContent = "Demo";
+  document.getElementById("st-marcaciones-sub").textContent = "conecta el backend admin";
+  const tbody = document.getElementById("tbl-recientes");
+  tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <p>Las marcaciones en tiempo real se mostrarán aquí cuando implementes <code>adminMarcacionesPorFecha</code> en el backend.</p>
+  </div></td></tr>`;
+}
+
+function renderizarRecientes(marcas) {
+  const tbody = document.getElementById("tbl-recientes");
+  if (!marcas.length) { renderizarRecientesMock(); return; }
+
+  const LABEL = { ENTRADA:"Entrada", SALIDA_ALMUERZO:"Sal. almuerzo", REGRESO_ALMUERZO:"Reg. almuerzo", SALIDA:"Salida" };
+  tbody.innerHTML = marcas.map(m => {
+    const empl = listaEmpleados.find(e => e.id === m.idEmpleado);
+    const emp  = listaEmpresas.find(e => e.id === m.idEmpresa);
+    return `<tr>
+      <td>${empl ? empl.nombres+" "+empl.apellidos : m.idEmpleado}</td>
+      <td>${emp ? emp.nombre : m.idEmpresa}</td>
+      <td><span class="badge badge-blue">${LABEL[m.tipo]||m.tipo}</span></td>
+      <td>${m.hora||"—"}</td>
+      <td>${badgeEstadoMarca(m.valido)}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ──────────────────────────────────────────
+//  EMPRESAS
+// ──────────────────────────────────────────
+function renderizarEmpresas() {
+  const tbody = document.getElementById("tbl-empresas");
+  if (!tablaEmpresas.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><p>No hay empresas registradas.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = tablaEmpresas.map(e => `
+    <tr>
+      <td><code style="font-size:.75rem;color:var(--text-muted)">${e.id}</code></td>
+      <td><div class="avatar-cell">
+        <div class="avatar">${initiales(e.nombre)}</div>
+        <div><div class="av-name">${e.nombre}</div><div class="av-sub">${e.email||"—"}</div></div>
+      </div></td>
+      <td>${e.contacto||"—"}</td>
+      <td><span class="badge badge-gray">${e.sedes||0} sedes</span></td>
+      <td><span class="badge badge-gray">${e.empleados||0} emp.</span></td>
+      <td><span class="badge ${badgePlan(e.plan)}">${e.plan||"—"}</span></td>
+      <td>${badgeEstado(e.estado)}</td>
+      <td>
+        <div style="display:flex;gap:.4rem">
+          <button class="btn btn-secondary btn-sm" onclick="editarEmpresa('${e.id}')">Editar</button>
+          <button class="btn btn-sm" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca" onclick="confirmarEliminar('empresa','${e.id}','${escHTML(e.nombre)}')">✕</button>
+        </div>
+      </td>
+    </tr>`).join("");
+}
+
+function filtrarEmpresas() {
+  const q     = document.getElementById("emp-search").value.toLowerCase();
+  const est   = document.getElementById("emp-estado-filter").value;
+  tablaEmpresas = listaEmpresas.filter(e =>
+    (!q   || e.nombre.toLowerCase().includes(q) || e.id.toLowerCase().includes(q)) &&
+    (!est || e.estado === est)
+  );
+  renderizarEmpresas();
+}
+
+function abrirModalEmpresa(empresa = null) {
+  document.getElementById("modal-empresa-title").textContent = empresa ? "Editar empresa" : "Nueva empresa";
+  document.getElementById("emp-id").value        = empresa?.id        || "";
+  document.getElementById("emp-nombre").value    = empresa?.nombre    || "";
+  document.getElementById("emp-contacto").value  = empresa?.contacto  || "";
+  document.getElementById("emp-email").value     = empresa?.email     || "";
+  document.getElementById("emp-telefono").value  = empresa?.telefono  || "";
+  document.getElementById("emp-plan").value      = empresa?.plan      || "PRO";
+  document.getElementById("emp-estado").value    = empresa?.estado    || "ACTIVO";
+  document.getElementById("emp-direccion").value = empresa?.direccion || "";
+  document.getElementById("emp-editando").value  = empresa?.id        || "";
+  document.getElementById("emp-id").disabled     = !!empresa;
+  abrirModal("modal-empresa");
+}
+
+function editarEmpresa(id) {
+  abrirModalEmpresa(listaEmpresas.find(e => e.id === id));
+}
+
+async function guardarEmpresa() {
+  const id     = document.getElementById("emp-id").value.trim();
+  const nombre = document.getElementById("emp-nombre").value.trim();
+  if (!id || !nombre) { toast("ID y nombre son obligatorios.", "error"); return; }
+
+  const datos = {
+    id, nombre,
+    contacto:  document.getElementById("emp-contacto").value.trim(),
+    email:     document.getElementById("emp-email").value.trim(),
+    telefono:  document.getElementById("emp-telefono").value.trim(),
+    plan:      document.getElementById("emp-plan").value,
+    estado:    document.getElementById("emp-estado").value,
+    direccion: document.getElementById("emp-direccion").value.trim(),
+  };
+
+  const editando = document.getElementById("emp-editando").value;
+  const btn = document.getElementById("btn-guardar-empresa");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner-sm"></span> Guardando…';
+
+  try {
+    const action = editando ? "adminEditarEmpresa" : "adminCrearEmpresa";
+    const r = await api(action, { empresa: datos });
+
+    if (r.success || !r.hasOwnProperty("success")) {
+      // Actualizar lista local
+      if (editando) {
+        const idx = listaEmpresas.findIndex(e => e.id === editando);
+        if (idx > -1) listaEmpresas[idx] = { ...listaEmpresas[idx], ...datos };
+      } else {
+        listaEmpresas.push({ ...datos, sedes: 0, empleados: 0 });
+      }
+      tablaEmpresas = [...listaEmpresas];
+      poblarSelectsEmpresa();
+      renderizarEmpresas();
+      cerrarModal("modal-empresa");
+      toast(editando ? "Empresa actualizada." : "Empresa creada.", "success");
+    } else {
+      toast(r.message || "Error al guardar.", "error");
+    }
+  } catch {
+    // Si el backend aún no tiene esta acción, actualizamos solo localmente
+    if (editando) {
+      const idx = listaEmpresas.findIndex(e => e.id === editando);
+      if (idx > -1) listaEmpresas[idx] = { ...listaEmpresas[idx], ...datos };
+    } else {
+      listaEmpresas.push({ ...datos, sedes: 0, empleados: 0 });
+    }
+    tablaEmpresas = [...listaEmpresas];
+    poblarSelectsEmpresa();
+    renderizarEmpresas();
+    cerrarModal("modal-empresa");
+    toast((editando ? "Empresa actualizada" : "Empresa creada") + " (solo local — backend pendiente).", "warning");
+  } finally {
+    btn.disabled = false; btn.innerHTML = "Guardar empresa";
+  }
+}
+
+// ──────────────────────────────────────────
+//  SEDES
+// ──────────────────────────────────────────
+function renderizarSedes() {
+  const tbody = document.getElementById("tbl-sedes");
+  if (!tablaSedes.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/></svg><p>No hay sedes registradas.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = tablaSedes.map(s => {
+    const emp = listaEmpresas.find(e => e.id === s.idEmpresa);
+    return `<tr>
+      <td><code style="font-size:.75rem;color:var(--text-muted)">${s.id}</code></td>
+      <td><strong>${s.nombre}</strong></td>
+      <td>${emp ? emp.nombre : s.idEmpresa}</td>
+      <td><span style="font-size:.75rem;font-family:monospace">${s.latitud}, ${s.longitud}</span></td>
+      <td><span class="badge badge-blue">${s.radio} m</span></td>
+      <td><span style="font-size:.78rem">${s.horarioInicio} – ${s.horarioFin}</span></td>
+      <td>${badgeEstado(s.estado)}</td>
+      <td>
+        <div style="display:flex;gap:.4rem">
+          <button class="btn btn-secondary btn-sm" onclick="editarSede('${s.id}')">Editar</button>
+          <button class="btn btn-sm" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca" onclick="confirmarEliminar('sede','${s.id}','${escHTML(s.nombre)}')">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+function filtrarSedes() {
+  const q   = document.getElementById("sede-search").value.toLowerCase();
+  const emp = document.getElementById("sede-empresa-filter").value;
+  tablaSedes = listaSedes.filter(s =>
+    (!q   || s.nombre.toLowerCase().includes(q) || s.id.toLowerCase().includes(q)) &&
+    (!emp || s.idEmpresa === emp)
+  );
+  renderizarSedes();
+}
+
+function abrirModalSede(sede = null) {
+  document.getElementById("modal-sede-title").textContent = sede ? "Editar sede" : "Nueva sede";
+  document.getElementById("sed-id").value          = sede?.id          || "";
+  document.getElementById("sed-nombre").value      = sede?.nombre      || "";
+  document.getElementById("sed-lat").value         = sede?.latitud     || "";
+  document.getElementById("sed-lon").value         = sede?.longitud    || "";
+  document.getElementById("sed-radio").value       = sede?.radio       || 150;
+  document.getElementById("sed-horario-ini").value = sede?.horarioInicio || "07:00";
+  document.getElementById("sed-horario-fin").value = sede?.horarioFin   || "20:00";
+  document.getElementById("sed-estado").value      = sede?.estado      || "ACTIVO";
+  document.getElementById("sed-editando").value    = sede?.id          || "";
+  document.getElementById("sed-id").disabled       = !!sede;
+
+  // Poblar empresa
+  const selEmp = document.getElementById("sed-empresa");
+  while (selEmp.options.length > 1) selEmp.remove(1);
+  listaEmpresas.forEach(e => { const o = document.createElement("option"); o.value=e.id; o.textContent=e.nombre; selEmp.appendChild(o); });
+  if (sede?.idEmpresa) selEmp.value = sede.idEmpresa;
+
+  actualizarMapaPreview();
+  abrirModal("modal-sede");
+}
+
+function editarSede(id) {
+  abrirModalSede(listaSedes.find(s => s.id === id));
+}
+
+function actualizarMapaPreview() {
+  const lat = document.getElementById("sed-lat").value;
+  const lon = document.getElementById("sed-lon").value;
+  const mp  = document.getElementById("map-preview");
+  if (lat && lon && !isNaN(lat) && !isNaN(lon)) {
+    const zoom = 16;
+    const url  = `https://maps.google.com/maps?q=${lat},${lon}&z=${zoom}&output=embed`;
+    mp.innerHTML = `<iframe src="${url}" width="100%" height="120" frameborder="0" style="border-radius:.5rem" loading="lazy"></iframe>`;
+  } else {
+    mp.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Ingresa las coordenadas para previsualizar`;
+  }
+}
+
+async function guardarSede() {
+  const id     = document.getElementById("sed-id").value.trim();
+  const nombre = document.getElementById("sed-nombre").value.trim();
+  const idEmp  = document.getElementById("sed-empresa").value;
+  const lat    = parseFloat(document.getElementById("sed-lat").value);
+  const lon    = parseFloat(document.getElementById("sed-lon").value);
+
+  if (!id || !nombre || !idEmp || isNaN(lat) || isNaN(lon)) {
+    toast("Completa todos los campos obligatorios.", "error"); return;
+  }
+
+  const datos = {
+    id, idEmpresa: idEmp, nombre,
+    latitud:      lat,
+    longitud:     lon,
+    radio:        parseInt(document.getElementById("sed-radio").value) || 150,
+    horarioInicio:document.getElementById("sed-horario-ini").value,
+    horarioFin:   document.getElementById("sed-horario-fin").value,
+    estado:       document.getElementById("sed-estado").value,
+  };
+
+  const editando = document.getElementById("sed-editando").value;
+
+  try {
+    const action = editando ? "adminEditarSede" : "adminCrearSede";
+    await api(action, { sede: datos });
+  } catch { /* backend pendiente */ }
+
+  if (editando) {
+    const idx = listaSedes.findIndex(s => s.id === editando);
+    if (idx > -1) listaSedes[idx] = { ...listaSedes[idx], ...datos };
+  } else {
+    listaSedes.push(datos);
+  }
+  tablaSedes = [...listaSedes];
+  renderizarSedes();
+  cerrarModal("modal-sede");
+  toast(editando ? "Sede actualizada." : "Sede creada.", "success");
+}
+
+// ──────────────────────────────────────────
+//  EMPLEADOS
+// ──────────────────────────────────────────
+function renderizarEmpleados() {
+  const tbody = document.getElementById("tbl-empleados");
+  if (!tablaEmpleados.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No hay empleados registrados.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = tablaEmpleados.map(e => {
+    const emp  = listaEmpresas.find(x => x.id === e.idEmpresa);
+    const sede = listaSedes.find(s => s.id === e.idSede);
+    return `<tr>
+      <td><div class="avatar-cell">
+        <div class="avatar">${initiales(e.nombres+" "+e.apellidos)}</div>
+        <div>
+          <div class="av-name">${e.nombres} ${e.apellidos}</div>
+          <div class="av-sub">${e.email||"—"}</div>
+        </div>
+      </div></td>
+      <td>
+        <div style="font-size:.82rem;font-weight:600">${emp?.nombre||e.idEmpresa}</div>
+        <div style="font-size:.72rem;color:var(--text-muted)">${sede?.nombre||e.idSede||"—"}</div>
+      </td>
+      <td>${e.cargo||"—"}</td>
+      <td><span class="badge badge-gray">${e.jornada||"—"}</span></td>
+      <td>${badgeEstado(e.estado)}</td>
+      <td>
+        <div style="display:flex;gap:.4rem">
+          <button class="btn btn-secondary btn-sm" onclick="editarEmpleado('${e.id}')">Editar</button>
+          <button class="btn btn-sm" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca" onclick="confirmarEliminar('empleado','${e.id}','${escHTML(e.nombres+' '+e.apellidos)}')">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+function filtrarEmpleados() {
+  const q   = document.getElementById("empl-search").value.toLowerCase();
+  const emp = document.getElementById("empl-empresa-filter").value;
+  const est = document.getElementById("empl-estado-filter").value;
+  tablaEmpleados = listaEmpleados.filter(e =>
+    (!q   || (e.nombres+" "+e.apellidos).toLowerCase().includes(q) || (e.cargo||"").toLowerCase().includes(q)) &&
+    (!emp || e.idEmpresa === emp) &&
+    (!est || e.estado === est)
+  );
+  renderizarEmpleados();
+}
+
+function abrirModalEmpleado(empleado = null) {
+  document.getElementById("modal-empleado-title").textContent = empleado ? "Editar empleado" : "Nuevo empleado";
+  document.getElementById("empl-id").value          = empleado?.id          || "";
+  document.getElementById("empl-pin").value         = "";  // PIN no se muestra por seguridad
+  document.getElementById("empl-nombres").value     = empleado?.nombres     || "";
+  document.getElementById("empl-apellidos").value   = empleado?.apellidos   || "";
+  document.getElementById("empl-email").value       = empleado?.email       || "";
+  document.getElementById("empl-telefono").value    = empleado?.telefono    || "";
+  document.getElementById("empl-cargo").value       = empleado?.cargo       || "";
+  document.getElementById("empl-departamento").value= empleado?.departamento|| "";
+  document.getElementById("empl-jornada").value     = empleado?.jornada     || "DIURNA";
+  document.getElementById("empl-estado").value      = empleado?.estado      || "ACTIVO";
+  document.getElementById("empl-editando").value    = empleado?.id          || "";
+  document.getElementById("empl-id").disabled       = !!empleado;
+
+  // PIN — en edición es opcional
+  const pinLabel = document.querySelector('label[for="empl-pin"]') || document.querySelector('#empl-pin').previousElementSibling;
+  if (empleado) {
+    document.getElementById("empl-pin").placeholder = "Dejar vacío para no cambiar";
+    document.querySelector('#empl-pin').removeAttribute("required");
+  } else {
+    document.getElementById("empl-pin").placeholder = "••••";
+  }
+
+  // Empresa y sede
+  const selEmp = document.getElementById("empl-empresa");
+  while (selEmp.options.length > 1) selEmp.remove(1);
+  listaEmpresas.forEach(e => { const o = document.createElement("option"); o.value=e.id; o.textContent=e.nombre; selEmp.appendChild(o); });
+  if (empleado?.idEmpresa) {
+    selEmp.value = empleado.idEmpresa;
+    actualizarSedesFiltro("empl-empresa","empl-sede");
+    document.getElementById("empl-sede").value = empleado.idSede || "";
+  }
+
+  abrirModal("modal-empleado");
+}
+
+function editarEmpleado(id) {
+  abrirModalEmpleado(listaEmpleados.find(e => e.id === id));
+}
+
+async function guardarEmpleado() {
+  const id      = document.getElementById("empl-id").value.trim();
+  const nombres = document.getElementById("empl-nombres").value.trim();
+  const apells  = document.getElementById("empl-apellidos").value.trim();
+  const idEmp   = document.getElementById("empl-empresa").value;
+  const idSede  = document.getElementById("empl-sede").value;
+  const pin     = document.getElementById("empl-pin").value.trim();
+  const editando= document.getElementById("empl-editando").value;
+
+  if (!id || !nombres || !apells || !idEmp || !idSede) {
+    toast("Completa los campos obligatorios.", "error"); return;
+  }
+  if (!editando && !pin) { toast("El PIN es obligatorio para nuevos empleados.", "error"); return; }
+
+  const datos = {
+    id, nombres, apellidos: apells,
+    email:        document.getElementById("empl-email").value.trim(),
+    telefono:     document.getElementById("empl-telefono").value.trim(),
+    idEmpresa:    idEmp,
+    idSede,
+    cargo:        document.getElementById("empl-cargo").value.trim(),
+    departamento: document.getElementById("empl-departamento").value.trim(),
+    jornada:      document.getElementById("empl-jornada").value,
+    estado:       document.getElementById("empl-estado").value,
+  };
+  if (pin) datos.pin = pin;
+
+  try {
+    const action = editando ? "adminEditarEmpleado" : "adminCrearEmpleado";
+    await api(action, { empleado: datos });
+  } catch { /* backend pendiente */ }
+
+  if (editando) {
+    const idx = listaEmpleados.findIndex(e => e.id === editando);
+    if (idx > -1) listaEmpleados[idx] = { ...listaEmpleados[idx], ...datos };
+  } else {
+    listaEmpleados.push(datos);
+  }
+  tablaEmpleados = [...listaEmpleados];
+  renderizarEmpleados();
+  cerrarModal("modal-empleado");
+  toast(editando ? "Empleado actualizado." : "Empleado creado.", "success");
+}
+
+// ──────────────────────────────────────────
+//  MARCACIONES (Reporte)
+// ──────────────────────────────────────────
+async function cargarMarcaciones() {
+  const ini  = document.getElementById("rep-fecha-ini").value;
+  const fin  = document.getElementById("rep-fecha-fin").value;
+  const emp  = document.getElementById("rep-empresa-filter").value;
+  const tipo = document.getElementById("rep-tipo-filter").value;
+
+  if (!ini || !fin) { toast("Selecciona un rango de fechas.", "error"); return; }
+
+  const lo = document.getElementById("loading-marcaciones");
+  lo.classList.add("show");
+
+  try {
+    const r = await api("adminMarcaciones", { fechaIni: ini, fechaFin: fin, idEmpresa: emp, tipo });
+    if (r.success) {
+      listaMarcaciones = r.marcaciones || [];
+    } else {
+      listaMarcaciones = [];
+      toast(r.message || "Sin resultados.", "warning");
+    }
+  } catch {
+    listaMarcaciones = [];
+    toast("El backend aún no tiene adminMarcaciones. Implementa esa acción en el GAS.", "warning");
+  } finally {
+    lo.classList.remove("show");
+  }
+
+  renderizarMarcaciones();
+}
+
+function renderizarMarcaciones() {
+  const tbody = document.getElementById("tbl-marcaciones");
+  document.getElementById("rep-count").textContent = listaMarcaciones.length + " registros";
+  document.getElementById("btn-export").disabled = !listaMarcaciones.length;
+
+  const LABEL = { ENTRADA:"Entrada", SALIDA_ALMUERZO:"Sal. almuerzo", REGRESO_ALMUERZO:"Reg. almuerzo", SALIDA:"Salida" };
+
+  if (!listaMarcaciones.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p>Sin registros para los filtros seleccionados.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = listaMarcaciones.map(m => `<tr>
+    <td><code style="font-size:.72rem">${m.id||"—"}</code></td>
+    <td>${m.idEmpleado||"—"}</td>
+    <td><div style="font-size:.82rem">${m.idEmpresa||"—"}</div><div style="font-size:.72rem;color:var(--text-muted)">${m.idSede||""}</div></td>
+    <td><span class="badge badge-blue">${LABEL[m.tipo]||m.tipo}</span></td>
+    <td>${m.fecha||"—"}</td>
+    <td>${m.hora||"—"}</td>
+    <td>${m.distancia!=null ? m.distancia+" m" : "—"}</td>
+    <td>${badgeEstadoMarca(m.valido)}</td>
+  </tr>`).join("");
+}
+
+function exportarCSV() {
+  if (!listaMarcaciones.length) return;
+  const cols = ["id","idEmpleado","idEmpresa","idSede","tipo","fecha","hora","latitud","longitud","distancia","radioSede","dentroGeovalla","valido"];
+  const rows = [cols.join(",")];
+  listaMarcaciones.forEach(m => rows.push(cols.map(c => JSON.stringify(m[c]??""  )).join(",")));
+  const blob = new Blob([rows.join("\n")], { type:"text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "marcaciones_" + fechaHoy() + ".csv";
+  a.click();
+}
+
+// ──────────────────────────────────────────
+//  AUDITORÍA
+// ──────────────────────────────────────────
+async function cargarAuditoria() {
+  const fecha  = document.getElementById("aud-fecha").value;
+  const accion = document.getElementById("aud-accion").value;
+
+  if (!fecha) { toast("Selecciona una fecha.", "error"); return; }
+
+  const lo = document.getElementById("loading-auditoria");
+  lo.classList.add("show");
+
+  try {
+    const r = await api("adminAuditoria", { fecha, accion });
+    if (r.success) {
+      renderizarAuditoria(r.logs || []);
+    } else {
+      renderizarAuditoria([]);
+      toast(r.message || "Sin resultados.", "warning");
+    }
+  } catch {
+    renderizarAuditoria([]);
+    toast("El backend aún no tiene adminAuditoria. Implementa esa acción en el GAS.", "warning");
+  } finally {
+    lo.classList.remove("show");
+  }
+}
+
+function renderizarAuditoria(logs) {
+  const tbody = document.getElementById("tbl-auditoria");
+  if (!logs.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg><p>Sin registros.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = logs.map(l => `<tr>
+    <td><code style="font-size:.72rem">${l[0]||"—"}</code></td>
+    <td style="font-size:.78rem;white-space:nowrap">${l[1]||"—"}</td>
+    <td>${l[3]||"—"}</td>
+    <td><span class="badge badge-gray">${l[4]||"—"}</span></td>
+    <td><span class="badge ${l[5]==="LOGIN_DENEGADO"?"badge-red":"badge-blue"}">${l[5]||"—"}</span></td>
+    <td style="font-size:.78rem;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escHTML(l[6]||"")}">${escHTML(l[6]||"—")}</td>
+    <td>${l[9]==="TRUE" ? '<span class="badge badge-green">✓ OK</span>' : '<span class="badge badge-red">✗ Fallo</span>'}</td>
+  </tr>`).join("");
+}
+
+// ──────────────────────────────────────────
+//  ELIMINAR
+// ──────────────────────────────────────────
+let _confirmCallback = null;
+
+function confirmarEliminar(tipo, id, nombre) {
+  document.getElementById("confirm-msg").innerHTML =
+    `¿Eliminar <strong>${nombre}</strong>? Esta acción no se puede deshacer.`;
+  _confirmCallback = () => eliminar(tipo, id, nombre);
+  document.getElementById("btn-confirm-ok").onclick = () => {
+    cerrarModal("modal-confirm");
+    _confirmCallback && _confirmCallback();
+  };
+  abrirModal("modal-confirm");
+}
+
+async function eliminar(tipo, id, nombre) {
+  try {
+    const actionMap = { empresa:"adminEliminarEmpresa", sede:"adminEliminarSede", empleado:"adminEliminarEmpleado" };
+    await api(actionMap[tipo], { id });
+  } catch { /* backend pendiente */ }
+
+  if      (tipo === "empresa")  { listaEmpresas  = listaEmpresas.filter(e => e.id !== id);  tablaEmpresas  = [...listaEmpresas];  renderizarEmpresas(); }
+  else if (tipo === "sede")     { listaSedes      = listaSedes.filter(s => s.id !== id);     tablaSedes     = [...listaSedes];     renderizarSedes(); }
+  else if (tipo === "empleado") { listaEmpleados  = listaEmpleados.filter(e => e.id !== id); tablaEmpleados = [...listaEmpleados]; renderizarEmpleados(); }
+
+  toast(`"${nombre}" eliminado.`, "success");
+}
+
+// ──────────────────────────────────────────
+//  MODALES
+// ──────────────────────────────────────────
+function abrirModal(id)  { document.getElementById(id).classList.add("open"); }
+function cerrarModal(id) { document.getElementById(id).classList.remove("open"); }
+
+document.querySelectorAll(".modal-overlay").forEach(overlay => {
+  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.classList.remove("open"); });
+});
+
+// ──────────────────────────────────────────
+//  TOAST
+// ──────────────────────────────────────────
+function toast(msg, tipo = "success") {
+  const el = document.createElement("div");
+  el.className = "toast " + tipo;
+  const icon = tipo === "success" ? "✓" : tipo === "error" ? "✕" : "⚠";
+  el.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  document.getElementById("toast-container").appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+// ──────────────────────────────────────────
+//  LOGOUT
+// ──────────────────────────────────────────
+function logout() {
+  localStorage.removeItem(STORAGE_KEY);
+  location.href = "login.html";
+}
+
+// ──────────────────────────────────────────
+//  HELPERS
+// ──────────────────────────────────────────
+function fechaHoy() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+
+function initiales(nombre) {
+  return (nombre||"?").split(" ").slice(0,2).map(p=>p[0]).join("").toUpperCase();
+}
+
+function escHTML(str) {
+  return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function safeParseJSON(str) {
+  try { return JSON.parse(str); } catch { return null; }
+}
+
+function badgeEstado(estado) {
+  const map = { ACTIVO:"badge-green", INACTIVO:"badge-gray", SUSPENDIDO:"badge-amber" };
+  return `<span class="badge ${map[estado]||"badge-gray"}"><span class="badge-dot"></span>${estado||"—"}</span>`;
+}
+
+function badgeEstadoMarca(valido) {
+  if (valido === "VALIDO"   || valido === true) return `<span class="badge badge-green">✓ Válido</span>`;
+  if (valido === "FUERA_DE_RANGO")               return `<span class="badge badge-amber">⚠ Fuera</span>`;
+  return `<span class="badge badge-gray">${valido||"—"}</span>`;
+}
+
+function badgePlan(plan) {
+  if (plan === "ENTERPRISE") return "badge-blue";
+  if (plan === "PRO")        return "badge-green";
+  return "badge-gray";
+}
+</script>
+</body>
+</html>
