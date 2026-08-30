@@ -1,41 +1,45 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- BLOQUEO: solo funciona instalada como PWA -->
+  <!-- ══ BLOQUEO WEB: solo funciona desde la app instalada ══ -->
   <script>
     (function() {
-      var isStandalone =
-        window.matchMedia('(display-mode: standalone)').matches ||
-        window.navigator.standalone === true;
-
-      if (!isStandalone) {
+      var standalone = window.matchMedia('(display-mode: standalone)').matches
+                    || window.navigator.standalone === true;
+      if (!standalone) {
         document.addEventListener('DOMContentLoaded', function() {
           document.body.innerHTML = '';
-          document.body.style.cssText = 'margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif;background:#080f1e;min-height:100dvh;display:flex;align-items:center;justify-content:center;';
-
+          document.body.style.cssText = 'margin:0;font-family:system-ui,-apple-system,sans-serif;background:#080f1e;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:1.5rem;';
           document.body.innerHTML = `
-            <div style="text-align:center;padding:2rem;max-width:340px;width:100%;">
-              <div style="width:70px;height:70px;background:rgba(239,68,68,0.15);border:2px solid rgba(239,68,68,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div style="text-align:center;max-width:320px;width:100%;">
+              <div style="width:68px;height:68px;background:rgba(239,68,68,0.12);border:2px solid rgba(239,68,68,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
               </div>
-              <div style="color:#fff;font-size:1.2rem;font-weight:800;margin-bottom:0.75rem;">Acceso no permitido</div>
-              <div style="color:rgba(255,255,255,0.5);font-size:0.88rem;line-height:1.6;margin-bottom:1.75rem;">
-                El sistema de asistencia solo funciona desde la <strong style="color:rgba(255,255,255,0.8)">aplicación instalada</strong>. No puedes acceder desde el navegador.
+              <div style="color:#fff;font-size:1.15rem;font-weight:800;margin-bottom:0.6rem;">Acceso no permitido</div>
+              <div style="color:rgba(255,255,255,0.45);font-size:0.86rem;line-height:1.65;margin-bottom:1.75rem;">
+                Este sistema solo funciona desde la <strong style="color:rgba(255,255,255,0.8)">app instalada</strong>. Instálala desde tu pantalla de inicio.
               </div>
-              <a href="index.html" style="display:inline-flex;align-items:center;gap:0.6rem;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;font-weight:700;font-size:0.95rem;padding:0.9rem 1.5rem;border-radius:0.85rem;text-decoration:none;box-shadow:0 8px 24px rgba(37,99,235,0.4);">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                Instalar la app
+              <a href="index.html" style="display:inline-flex;align-items:center;gap:0.55rem;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;font-weight:700;font-size:0.92rem;padding:0.9rem 1.4rem;border-radius:0.85rem;text-decoration:none;box-shadow:0 8px 24px rgba(37,99,235,0.4);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Instalar Time AZV
               </a>
-            </div>
-          `;
+            </div>`;
         });
       }
     })();
   </script>
 
   <meta charset="UTF-8">
+    <meta name="theme-color" content="#1040b0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Time AZV">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="logo-192.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control de Asistencia SaaS</title>
+  <title>Time AZV — Asistencia</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -276,6 +280,45 @@
     .lockout h3 { color: var(--danger); margin-bottom: 0.5rem; }
     .lockout p { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem; }
     .countdown { font-size: 1.5rem; font-weight: 700; color: var(--danger); }
+
+    /* ── Botones de marcación ── */
+    .btn-marca {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.8rem 0.5rem;
+      border: none;
+      border-radius: 0.65rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      -webkit-tap-highlight-color: transparent;
+      line-height: 1.2;
+      text-align: center;
+    }
+    .btn-marca:active:not(:disabled) { transform: scale(0.97); }
+    .btn-marca:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+    .btn-marca svg { flex-shrink: 0; }
+
+    /* Ítem del historial */
+    .historial-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+    .historial-item:last-child { border-bottom: none; }
+    .historial-tipo { font-weight: 600; color: var(--text); }
+    .historial-hora { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .historial-geo  { font-size: 0.72rem; }
+    .geo-ok   { color: var(--success); }
+    .geo-warn { color: #f59e0b; }
+
   </style>
 </head>
 <body>
@@ -289,7 +332,7 @@
       <div class="logo-icon">
         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
       </div>
-      <span class="logo-text">AsistenciaPWA</span>
+      <span class="logo-text">Time AZV</span>
     </div>
     <p class="card-subtitle">Ingresa tu PIN para marcar asistencia</p>
 
@@ -342,11 +385,12 @@
   <!-- ════════════════ VISTA: DASHBOARD ════════════════ -->
   <div id="view-dashboard" class="dashboard">
 
-    <div class="logo" style="margin-bottom:1.5rem">
+    <!-- Header usuario -->
+    <div class="logo" style="margin-bottom:1.25rem">
       <div class="logo-icon">
         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
       </div>
-      <span class="logo-text">AsistenciaPWA</span>
+      <span class="logo-text">Time AZV</span>
     </div>
 
     <div class="user-card">
@@ -355,15 +399,61 @@
       <div class="role"    id="user-cargo"></div>
     </div>
 
-    <div style="text-align:center">
+    <div style="text-align:center; margin-bottom:1.25rem">
       <span class="status-badge">
         <span></span> Sesión activa
       </span>
     </div>
 
-    <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; margin-bottom:1.5rem;">
-      Listo para integrar geolocalización y botones de marcación.
-    </p>
+    <!-- Sede y hora actual -->
+    <div style="display:flex; gap:0.6rem; margin-bottom:1.5rem;">
+      <div style="flex:1; background:#f8fafc; border:1px solid var(--border); border-radius:0.65rem; padding:0.75rem; text-align:center;">
+        <div style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:0.2rem;">Sede</div>
+        <div id="user-sede" style="font-size:0.85rem; font-weight:600; color:var(--text);">—</div>
+      </div>
+      <div style="flex:1; background:#f8fafc; border:1px solid var(--border); border-radius:0.65rem; padding:0.75rem; text-align:center;">
+        <div style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:0.2rem;">Hora</div>
+        <div id="reloj-live" style="font-size:0.85rem; font-weight:700; color:var(--primary); font-variant-numeric:tabular-nums;">--:--:--</div>
+      </div>
+    </div>
+
+    <!-- GPS status -->
+    <div id="gps-status" style="background:#fffbeb; border:1px solid #fde68a; border-radius:0.65rem; padding:0.7rem 0.9rem; font-size:0.82rem; color:#92400e; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
+      <span>📡</span><span id="gps-texto">Obteniendo ubicación GPS...</span>
+    </div>
+
+    <!-- Botones de marcación -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.65rem; margin-bottom:1.25rem;">
+      <button class="btn-marca" id="btn-entrada"          data-tipo="ENTRADA"          style="background:#10b981; color:#fff;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+        Entrada
+      </button>
+      <button class="btn-marca" id="btn-salida-almuerzo"  data-tipo="SALIDA_ALMUERZO"  style="background:#f59e0b; color:#fff;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+        Salida Almuerzo
+      </button>
+      <button class="btn-marca" id="btn-regreso-almuerzo" data-tipo="REGRESO_ALMUERZO" style="background:#3b82f6; color:#fff;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13 16l4-4m0 0l-4-4m4 4H3m5 4v1a3 3 0 003 3h7a3 3 0 003-3V7a3 3 0 00-3-3h-7a3 3 0 00-3 3v1"/></svg>
+        Regreso Almuerzo
+      </button>
+      <button class="btn-marca" id="btn-salida"           data-tipo="SALIDA"           style="background:#ef4444; color:#fff;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Salida
+      </button>
+    </div>
+
+    <!-- Resultado de marcación -->
+    <div id="marca-result" style="display:none; border-radius:0.65rem; padding:0.85rem 1rem; font-size:0.85rem; margin-bottom:1.25rem; line-height:1.5;"></div>
+
+    <!-- Historial del día -->
+    <div style="background:#f8fafc; border:1px solid var(--border); border-radius:0.75rem; padding:0.9rem; margin-bottom:1.25rem;">
+      <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-muted); margin-bottom:0.75rem;">
+        📋 Marcaciones de hoy
+      </div>
+      <div id="historial-lista" style="font-size:0.82rem; color:var(--text-muted);">
+        Cargando...
+      </div>
+    </div>
 
     <button id="btn-logout" class="btn-logout">Cerrar sesión</button>
   </div>
@@ -372,9 +462,9 @@
 
 <script>
   // ─────────────────────────────────────────
-  //  CONFIGURACIÓN
+  //  CONFIGURACIÓN — Reemplaza con tu URL
   // ─────────────────────────────────────────
-  const API_URL = "https://script.google.com/macros/s/AKfycbzF4VXoD2rU0iBjb5If39ZsT2GnGdaQawgATS3k8x7xqq2XvzZ7hOz-enu6l0m7IVvcnw/exec";
+  const API_URL = "https://script.google.com/macros/s/TU_DEPLOYMENT_ID_AQUI/exec";
 
   const MAX_INTENTOS   = 5;       // bloqueo tras N fallos
   const BLOQUEO_SEG    = 5 * 60;  // duración del bloqueo en segundos (5 min)
@@ -557,9 +647,19 @@
     viewLockout.style.display   = "none";
     viewDashboard.style.display = "block";
 
+    sesionActiva = usuario;
+
     document.getElementById("user-empresa").textContent = (usuario.nombreEmpresa || "").toUpperCase();
     document.getElementById("user-nombre").textContent  = usuario.nombre  || "—";
-    document.getElementById("user-cargo").textContent   = usuario.cargo   || "";
+    document.getElementById("user-cargo").textContent   = usuario.cargo   || (usuario.rol || "");
+
+    const sedeEl = document.getElementById("user-sede");
+    if (sedeEl) sedeEl.textContent = usuario.nombreSede || "—";
+
+    habilitarBotones(false); // desactivar hasta tener GPS
+    iniciarReloj();
+    iniciarGPS();
+    cargarHistorial();
   }
 
   // ─────────────────────────────────────────
@@ -591,6 +691,182 @@
   function safeParseJSON(str) {
     try { return JSON.parse(str); } catch { return null; }
   }
+
+  // ─────────────────────────────────────────
+  //  GPS + MARCACIONES + HISTORIAL
+  // ─────────────────────────────────────────
+  let gpsActual = null;
+  let sesionActiva = null;
+
+  // Reloj en vivo
+  function iniciarReloj() {
+    function tick() {
+      const ahora = new Date();
+      const h = String(ahora.getHours()).padStart(2,"0");
+      const m = String(ahora.getMinutes()).padStart(2,"0");
+      const s = String(ahora.getSeconds()).padStart(2,"0");
+      const el = document.getElementById("reloj-live");
+      if (el) el.textContent = h + ":" + m + ":" + s;
+    }
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  // Obtener GPS continuo
+  function iniciarGPS() {
+    const gpsEl  = document.getElementById("gps-status");
+    const gpsTxt = document.getElementById("gps-texto");
+    if (!gpsEl || !gpsTxt) return;
+
+    if (!navigator.geolocation) {
+      gpsEl.style.background = "#fef2f2";
+      gpsEl.style.borderColor = "#fecaca";
+      gpsEl.style.color = "#b91c1c";
+      gpsTxt.textContent = "GPS no disponible en este dispositivo.";
+      return;
+    }
+
+    navigator.geolocation.watchPosition(
+      (pos) => {
+        gpsActual = { lat: pos.coords.latitude, lng: pos.coords.longitude, precision: pos.coords.accuracy };
+        gpsEl.style.background  = "#ecfdf5";
+        gpsEl.style.borderColor = "#a7f3d0";
+        gpsEl.style.color       = "#065f46";
+        gpsTxt.textContent = "📍 GPS activo — Precisión: " + Math.round(pos.coords.accuracy) + "m";
+        habilitarBotones(true);
+      },
+      (err) => {
+        gpsActual = null;
+        gpsEl.style.background  = "#fef2f2";
+        gpsEl.style.borderColor = "#fecaca";
+        gpsEl.style.color       = "#b91c1c";
+        gpsTxt.textContent = "❌ No se pudo obtener GPS. Activa la ubicación.";
+        habilitarBotones(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  }
+
+  function habilitarBotones(estado) {
+    document.querySelectorAll(".btn-marca").forEach(btn => {
+      btn.disabled = !estado;
+    });
+  }
+
+  // Click en cualquier botón de marcación
+  document.querySelectorAll(".btn-marca").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!gpsActual) {
+        mostrarResultadoMarca("❌ Espera a que el GPS esté activo.", "error");
+        return;
+      }
+      if (!sesionActiva) return;
+
+      const tipo = btn.dataset.tipo;
+      habilitarBotones(false);
+      mostrarResultadoMarca("⏳ Registrando...", "loading");
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action:      "marcar",
+            idEmpleado:  sesionActiva.id,
+            idEmpresa:   sesionActiva.idEmpresa,
+            idSede:      sesionActiva.idSede,
+            tipo:        tipo,
+            latitud:     gpsActual.lat,
+            longitud:    gpsActual.lng,
+            precision:   gpsActual.precision,
+            dispositivo: navigator.userAgent,
+            token:       sesionActiva.token
+          })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          const tipo_label = {
+            ENTRADA: "Entrada", SALIDA_ALMUERZO: "Salida Almuerzo",
+            REGRESO_ALMUERZO: "Regreso Almuerzo", SALIDA: "Salida"
+          }[tipo] || tipo;
+          const dist = data.distancia != null ? " · " + data.distancia + "m de la sede" : "";
+          mostrarResultadoMarca(
+            (data.dentroGeovalla ? "✅ " : "⚠️ ") + tipo_label + " registrada" + dist + ".<br><small style='opacity:.75'>" + data.mensaje + "</small>",
+            data.dentroGeovalla ? "ok" : "warn"
+          );
+          cargarHistorial(); // refrescar historial
+        } else {
+          mostrarResultadoMarca("❌ " + (data.message || "Error al marcar."), "error");
+        }
+      } catch(err) {
+        mostrarResultadoMarca("❌ Error de conexión. Verifica internet.", "error");
+      } finally {
+        habilitarBotones(true);
+      }
+    });
+  });
+
+  function mostrarResultadoMarca(html_content, tipo) {
+    const el = document.getElementById("marca-result");
+    if (!el) return;
+    el.style.display = "block";
+    el.innerHTML = html_content;
+    el.style.background = tipo === "ok"      ? "#ecfdf5" :
+                          tipo === "warn"     ? "#fffbeb" :
+                          tipo === "error"    ? "#fef2f2" : "#f1f5f9";
+    el.style.border     = tipo === "ok"      ? "1px solid #a7f3d0" :
+                          tipo === "warn"     ? "1px solid #fde68a" :
+                          tipo === "error"    ? "1px solid #fecaca" : "1px solid #e2e8f0";
+    el.style.color      = tipo === "ok"      ? "#065f46" :
+                          tipo === "warn"     ? "#92400e" :
+                          tipo === "error"    ? "#b91c1c" : "#374151";
+  }
+
+  // Cargar historial del día
+  async function cargarHistorial() {
+    const lista = document.getElementById("historial-lista");
+    if (!lista || !sesionActiva) return;
+    lista.textContent = "Cargando...";
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "historial",
+          idEmpleado: sesionActiva.id,
+          idEmpresa:  sesionActiva.idEmpresa
+        })
+      });
+      const data = await res.json();
+
+      if (data.success && data.marcaciones.length > 0) {
+        const etiquetas = {
+          ENTRADA: "🟢 Entrada", SALIDA_ALMUERZO: "🟡 Sal. Almuerzo",
+          REGRESO_ALMUERZO: "🔵 Reg. Almuerzo", SALIDA: "🔴 Salida"
+        };
+        lista.innerHTML = data.marcaciones.map(m =>
+          `<div class="historial-item">
+            <span class="historial-tipo">${etiquetas[m.tipo] || m.tipo}</span>
+            <span style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="historial-hora">${m.hora}</span>
+              <span class="historial-geo ${m.dentroGeovalla === 'TRUE' ? 'geo-ok' : 'geo-warn'}">
+                ${m.dentroGeovalla === 'TRUE' ? '📍' : '⚠️'}
+              </span>
+            </span>
+          </div>`
+        ).join('');
+      } else if (data.success) {
+        lista.innerHTML = '<span style="color:#94a3b8;font-size:0.8rem;">Sin marcaciones hoy.</span>';
+      } else {
+        lista.innerHTML = '<span style="color:#ef4444;font-size:0.8rem;">Error al cargar historial.</span>';
+      }
+    } catch {
+      lista.innerHTML = '<span style="color:#94a3b8;font-size:0.8rem;">Sin conexión.</span>';
+    }
+  }
+
 </script>
 </body>
 </html>
