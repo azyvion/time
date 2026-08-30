@@ -13,40 +13,54 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" sizes="192x192" href="logo-192.png">
   <link rel="apple-touch-icon" sizes="512x512" href="logo-512.png">
-  <link rel="apple-touch-startup-image" href="logo-512.png">
-
-  <!-- Si ya está instalada → login directo -->
-  <script>
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-      window.location.replace('login.html');
-    }
-  </script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: #0b1829;
+      background: #080f1e;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 2rem 1.5rem;
-      overflow: hidden;
       position: relative;
+      overflow: hidden;
     }
 
-    /* Fondo animado */
-    body::before {
-      content: '';
+    /* ── Fondo animado ── */
+    .bg-orb {
       position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(37,99,235,0.35) 0%, transparent 70%),
-        radial-gradient(ellipse 60% 40% at 80% 110%, rgba(16,64,176,0.25) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(80px);
       pointer-events: none;
+      z-index: 0;
+    }
+    .bg-orb-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%);
+      top: -150px; left: -100px;
+      animation: float1 8s ease-in-out infinite;
+    }
+    .bg-orb-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(16,64,176,0.2) 0%, transparent 70%);
+      bottom: -100px; right: -100px;
+      animation: float2 10s ease-in-out infinite;
+    }
+    @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,20px)} }
+    @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,-30px)} }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 360px;
     }
 
     /* ── Logo ── */
@@ -54,78 +68,82 @@
       position: relative;
       margin-bottom: 2rem;
     }
-    .logo-glow {
+    .logo-ring {
       position: absolute;
-      inset: -20px;
-      background: radial-gradient(circle, rgba(37,99,235,0.5) 0%, transparent 70%);
-      border-radius: 50%;
-      animation: breathe 3s ease-in-out infinite;
+      inset: -14px;
+      border-radius: 36px;
+      background: conic-gradient(from 0deg, #2563eb, #60a5fa, #1d4ed8, #2563eb);
+      animation: spin 4s linear infinite;
+      opacity: 0.6;
     }
-    @keyframes breathe {
-      0%,100% { opacity: 0.6; transform: scale(0.95); }
-      50%      { opacity: 1;   transform: scale(1.05); }
+    .logo-ring-mask {
+      position: absolute;
+      inset: -10px;
+      border-radius: 32px;
+      background: #080f1e;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
     .logo-img {
       position: relative;
+      z-index: 1;
       width: 110px;
       height: 110px;
       border-radius: 26px;
       object-fit: cover;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.4), 0 20px 50px rgba(0,0,0,0.5);
-      z-index: 1;
+      display: block;
     }
 
-    /* ── Textos ── */
+    /* ── Nombre ── */
     .app-name {
       color: #fff;
-      font-size: 2rem;
+      font-size: 2.1rem;
       font-weight: 800;
       letter-spacing: -0.04em;
       text-align: center;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.3rem;
     }
-    .app-name span { color: #60a5fa; }
-
-    .app-by {
-      color: rgba(255,255,255,0.35);
-      font-size: 0.78rem;
+    .app-name em { color: #60a5fa; font-style: normal; }
+    .app-sub {
+      color: rgba(255,255,255,0.3);
+      font-size: 0.72rem;
       font-weight: 600;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      text-align: center;
       margin-bottom: 2.5rem;
+      text-align: center;
     }
 
-    /* ── Bloque de requisito ── */
-    .requirement-box {
-      background: rgba(239,68,68,0.1);
-      border: 1px solid rgba(239,68,68,0.3);
+    /* ── Caja de estado ── */
+    .status-box {
+      width: 100%;
       border-radius: 1rem;
-      padding: 1rem 1.25rem;
+      padding: 1rem 1.2rem;
       display: flex;
       align-items: flex-start;
       gap: 0.75rem;
-      margin-bottom: 2rem;
-      max-width: 340px;
-      width: 100%;
-    }
-    .req-icon {
-      font-size: 1.2rem;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-    .req-text {
+      margin-bottom: 1.75rem;
       font-size: 0.85rem;
-      color: rgba(255,255,255,0.75);
-      line-height: 1.5;
+      line-height: 1.55;
+      transition: all 0.4s ease;
     }
-    .req-text strong { color: #fca5a5; }
+    .status-box.required {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: rgba(255,255,255,0.7);
+    }
+    .status-box.required strong { color: #fca5a5; }
+    .status-box.success {
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      color: rgba(255,255,255,0.75);
+    }
+    .status-box.success strong { color: #6ee7b7; }
+    .status-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
 
-    /* ── Botón principal ── */
-    .btn-install {
+    /* ── Botón instalar ── */
+    #btn-install {
       position: relative;
       width: 100%;
-      max-width: 340px;
       padding: 1.1rem 1.5rem;
       border: none;
       border-radius: 1rem;
@@ -139,169 +157,220 @@
       align-items: center;
       justify-content: center;
       gap: 0.65rem;
-      box-shadow: 0 0 0 0 rgba(37,99,235,0.6);
-      animation: pulse-btn 2.5s ease-in-out infinite;
-      transition: transform 0.15s, box-shadow 0.15s;
+      transition: transform 0.15s, opacity 0.15s;
       -webkit-tap-highlight-color: transparent;
+      animation: glow-pulse 2.5s ease-in-out infinite;
     }
-    @keyframes pulse-btn {
-      0%,100% { box-shadow: 0 8px 30px rgba(37,99,235,0.5), 0 0 0 0 rgba(37,99,235,0.4); }
-      50%      { box-shadow: 0 8px 30px rgba(37,99,235,0.7), 0 0 0 12px rgba(37,99,235,0); }
+    @keyframes glow-pulse {
+      0%,100% { box-shadow: 0 8px 30px rgba(37,99,235,0.45); }
+      50%      { box-shadow: 0 8px 40px rgba(37,99,235,0.75), 0 0 0 8px rgba(37,99,235,0.08); }
     }
-    .btn-install:active { transform: scale(0.97); animation: none; }
-    .btn-install svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
+    #btn-install:active  { transform: scale(0.97); animation: none; }
+    #btn-install:disabled { opacity: 0.5; cursor: not-allowed; animation: none; }
+    #btn-install svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
 
-    /* ── Instrucciones iOS (se muestra solo en iOS) ── */
-    .ios-panel {
+    /* ── Panel iOS ── */
+    #ios-panel {
       display: none;
       width: 100%;
-      max-width: 340px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 1rem;
-      padding: 1.25rem;
+      padding: 1.2rem;
       margin-top: 1rem;
-      animation: slideUp 0.3s ease;
+      animation: fadeUp 0.3s ease;
     }
-    @keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-
-    .ios-panel h3 {
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    #ios-panel h3 {
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 700;
-      margin-bottom: 1rem;
       text-align: center;
+      margin-bottom: 1rem;
     }
     .ios-step {
       display: flex;
       align-items: flex-start;
       gap: 0.7rem;
       margin-bottom: 0.85rem;
-      font-size: 0.84rem;
-      color: rgba(255,255,255,0.65);
-      line-height: 1.45;
+      font-size: 0.83rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.5;
     }
     .ios-step:last-child { margin-bottom: 0; }
-    .ios-num {
+    .ios-step b { color: #fff; }
+    .step-n {
       flex-shrink: 0;
       width: 22px; height: 22px;
       background: #2563eb;
       color: #fff;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-weight: 800;
-      font-size: 0.7rem;
+      font-weight: 800; font-size: 0.7rem;
     }
-    .ios-step b { color: #fff; }
-    .share-icon {
-      display: inline-block;
-      vertical-align: middle;
-      width: 16px; height: 16px;
-      margin: 0 2px;
-    }
+    .si { display:inline-block; vertical-align:middle; width:15px; height:15px; margin:0 2px; }
 
-    /* ── Mensaje escritorio ── */
-    .desktop-panel {
+    /* ── Desktop ── */
+    #desktop-panel {
       display: none;
       width: 100%;
-      max-width: 340px;
       text-align: center;
-      color: rgba(255,255,255,0.4);
+      color: rgba(255,255,255,0.35);
       font-size: 0.85rem;
       line-height: 1.6;
       margin-top: 1rem;
       padding: 1rem;
-      background: rgba(255,255,255,0.04);
-      border: 1px dashed rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.1);
       border-radius: 1rem;
     }
 
-    /* ── Footer ── */
+    /* ── Éxito post-instalación ── */
+    #success-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+      width: 100%;
+      animation: fadeUp 0.5s ease;
+    }
+    .check-circle {
+      width: 72px; height: 72px;
+      background: rgba(16,185,129,0.15);
+      border: 2px solid #10b981;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      animation: pop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    @keyframes pop { from{transform:scale(0)} to{transform:scale(1)} }
+    .check-circle svg { width: 36px; height: 36px; }
+    .success-title {
+      color: #fff;
+      font-size: 1.3rem;
+      font-weight: 800;
+      text-align: center;
+    }
+    .success-desc {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .success-desc strong { color: rgba(255,255,255,0.85); }
+    .success-tip {
+      background: rgba(37,99,235,0.12);
+      border: 1px solid rgba(37,99,235,0.25);
+      border-radius: 0.85rem;
+      padding: 0.85rem 1rem;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.55;
+      text-align: center;
+      width: 100%;
+    }
+    .success-tip strong { color: #93c5fd; }
+
     .footer {
       position: fixed;
-      bottom: 1.5rem;
-      color: rgba(255,255,255,0.2);
-      font-size: 0.72rem;
+      bottom: 1.25rem;
+      color: rgba(255,255,255,0.15);
+      font-size: 0.7rem;
       letter-spacing: 0.05em;
-      text-align: center;
+      z-index: 1;
     }
   </style>
 </head>
 <body>
 
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+
+<div class="content">
+
   <!-- Logo -->
   <div class="logo-wrap">
-    <div class="logo-glow"></div>
+    <div class="logo-ring"></div>
+    <div class="logo-ring-mask"></div>
     <img src="logo.jpg" alt="Time AZV" class="logo-img">
   </div>
 
   <!-- Nombre -->
-  <div class="app-name">Time <span>AZV</span></div>
-  <div class="app-by">by Azyvion · Control de Asistencia</div>
+  <div class="app-name">Time <em>AZV</em></div>
+  <div class="app-sub">Control de Asistencia · Azyvion</div>
 
-  <!-- Aviso de requisito -->
-  <div class="requirement-box">
-    <div class="req-icon">🔒</div>
-    <div class="req-text">
-      <strong>Instalación obligatoria.</strong> Para acceder al sistema de asistencia debes instalar esta app en tu dispositivo.
-    </div>
+  <!-- Caja de estado (cambia según lo que pase) -->
+  <div class="status-box required" id="status-box">
+    <span class="status-icon">🔒</span>
+    <div><strong>Instalación obligatoria.</strong> Para acceder al sistema de asistencia debes instalar esta app en tu dispositivo.</div>
   </div>
 
-  <!-- BOTÓN PRINCIPAL -->
-  <button class="btn-install" id="btn-install">
-    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-    Instalar Time AZV
-  </button>
+  <!-- Vista: instalación pendiente -->
+  <div id="install-state" style="width:100%; display:flex; flex-direction:column; gap:0.85rem;">
 
-  <!-- Panel éxito instalación Android -->
-  <div id="success-panel" style="display:none; flex-direction:column; align-items:center; gap:1rem; width:100%; max-width:340px; text-align:center; animation: slideUp 0.4s ease;">
-    <div style="width:64px;height:64px;background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
-    <div style="color:#fff;font-size:1.15rem;font-weight:800;">¡App instalada!</div>
-    <div style="color:rgba(255,255,255,0.55);font-size:0.9rem;line-height:1.6;">
-      Busca el ícono de <strong style="color:#fff">Time AZV</strong> en tu pantalla de inicio y ábrela desde ahí.
-    </div>
-    <div style="background:rgba(37,99,235,0.15);border:1px solid rgba(37,99,235,0.3);border-radius:0.85rem;padding:0.85rem 1.1rem;color:rgba(255,255,255,0.6);font-size:0.82rem;line-height:1.5;">
-      📌 No uses el navegador — abre siempre desde el ícono de la app para que funcione correctamente.
-    </div>
-  </div>
+    <!-- Botón principal -->
+    <button id="btn-install">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Instalar Time AZV
+    </button>
 
-  <!-- Panel iOS (oculto hasta que se detecte iOS) -->
-  <div class="ios-panel" id="ios-panel">
-    <h3>Instala desde Safari en 3 pasos:</h3>
-    <div class="ios-step">
-      <div class="ios-num">1</div>
-      <div>Toca el botón <b>Compartir</b>
-        <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/>
-          <polyline points="16 6 12 2 8 6"/>
-          <line x1="12" y1="2" x2="12" y2="15"/>
-        </svg>
-        en la barra inferior de Safari.
+    <!-- Panel iOS -->
+    <div id="ios-panel">
+      <h3>📱 Instala en Safari — 3 pasos</h3>
+      <div class="ios-step">
+        <div class="step-n">1</div>
+        <div>Toca el botón <b>Compartir</b>
+          <svg class="si" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/>
+            <polyline points="16 6 12 2 8 6"/>
+            <line x1="12" y1="2" x2="12" y2="15"/>
+          </svg>
+          en la barra inferior de Safari.
+        </div>
+      </div>
+      <div class="ios-step">
+        <div class="step-n">2</div>
+        <div>Desliza y toca <b>"Agregar a inicio"</b>.</div>
+      </div>
+      <div class="ios-step">
+        <div class="step-n">3</div>
+        <div>Toca <b>"Agregar"</b> arriba a la derecha. ¡Listo!</div>
       </div>
     </div>
-    <div class="ios-step">
-      <div class="ios-num">2</div>
-      <div>Desliza y toca <b>"Agregar a inicio"</b>.</div>
+
+    <!-- Desktop -->
+    <div id="desktop-panel">
+      📱 Abre esta URL desde tu celular<br>
+      <strong style="color:rgba(255,255,255,0.55)">Chrome (Android) · Safari (iPhone)</strong>
     </div>
-    <div class="ios-step">
-      <div class="ios-num">3</div>
-      <div>Toca <b>"Agregar"</b> arriba a la derecha. ¡Ya está!</div>
+
+  </div>
+
+  <!-- Vista: instalación exitosa (oculta hasta que instalen) -->
+  <div id="success-state">
+    <div class="check-circle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <div class="success-title">¡App instalada!</div>
+    <div class="success-desc">
+      Busca el ícono de <strong>Time AZV</strong> en tu pantalla de inicio y ábrela desde ahí para iniciar sesión.
+    </div>
+    <div class="success-tip">
+      📌 Siempre abre la app desde el <strong>ícono en tu pantalla de inicio</strong>, no desde el navegador.
     </div>
   </div>
 
-  <!-- Panel escritorio -->
-  <div class="desktop-panel" id="desktop-panel">
-    📱 Abre esta URL desde tu celular<br>
-    (Chrome en Android · Safari en iPhone)
-  </div>
+</div>
 
-  <div class="footer">© Azyvion · Time AZV</div>
+<div class="footer">© Azyvion · Time AZV</div>
 
 <script>
-  const btnInstall  = document.getElementById('btn-install');
-  const iosPanel    = document.getElementById('ios-panel');
+  const btnInstall   = document.getElementById('btn-install');
+  const installState = document.getElementById('install-state');
+  const successState = document.getElementById('success-state');
+  const statusBox    = document.getElementById('status-box');
+  const iosPanel     = document.getElementById('ios-panel');
   const desktopPanel = document.getElementById('desktop-panel');
 
   const ua        = navigator.userAgent;
@@ -310,57 +379,117 @@
   const isMobile  = isIOS || isAndroid;
 
   let deferredPrompt = null;
+  let notifPermission = false;
 
-  // ── Android: capturar el prompt nativo ──────────────────────────────────────
+  // ── Pedir permiso de notificaciones al cargar ─────────────────────────────
+  async function pedirNotificaciones() {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'granted') { notifPermission = true; return; }
+    if (Notification.permission !== 'denied') {
+      const perm = await Notification.requestPermission();
+      notifPermission = perm === 'granted';
+    }
+  }
+
+  // ── Disparar notificación de instalación exitosa ──────────────────────────
+  function notificarInstalacion() {
+    if (!notifPermission || !('Notification' in window)) return;
+
+    // Intentar via Service Worker (más confiable en mobile)
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.showNotification('¡Time AZV instalada! ✅', {
+          body: 'La app está lista. Ábrela desde tu pantalla de inicio para iniciar sesión.',
+          icon: 'logo-192.png',
+          badge: 'logo-192.png',
+          tag: 'install-success',
+          requireInteraction: false,
+          vibrate: [200, 100, 200]
+        });
+      });
+    } else {
+      new Notification('¡Time AZV instalada! ✅', {
+        body: 'La app está lista. Ábrela desde tu pantalla de inicio.',
+        icon: 'logo-192.png',
+        tag: 'install-success'
+      });
+    }
+  }
+
+  // ── Mostrar estado de éxito ───────────────────────────────────────────────
+  function mostrarExito() {
+    // Ocultar panel de instalación
+    installState.style.display = 'none';
+
+    // Cambiar caja de estado
+    statusBox.className = 'status-box success';
+    statusBox.innerHTML = '<span class="status-icon">✅</span><div><strong>¡Instalación completada!</strong> Abre la app desde tu pantalla de inicio.</div>';
+
+    // Mostrar éxito
+    successState.style.display = 'flex';
+
+    // Notificación
+    notificarInstalacion();
+  }
+
+  // ── Android: capturar beforeinstallprompt ────────────────────────────────
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    // Ya tenemos el prompt listo → el botón hará el trabajo
+    pedirNotificaciones(); // pedir permiso cuando sabemos que puede instalar
   });
 
-  // ── Click en "Instalar Time AZV" ────────────────────────────────────────────
+  // ── Click botón instalar ──────────────────────────────────────────────────
   btnInstall.addEventListener('click', async () => {
 
-    // Android con prompt disponible: lanzar diálogo nativo del sistema
+    // Android: prompt nativo
     if (deferredPrompt) {
+      btnInstall.disabled = true;
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       deferredPrompt = null;
-      return; // el evento appinstalled se encarga de redirigir
-    }
-
-    // iOS: mostrar/ocultar instrucciones manuales
-    if (isIOS) {
-      const visible = iosPanel.style.display === 'block';
-      iosPanel.style.display = visible ? 'none' : 'block';
-      btnInstall.querySelector('span') && null; // noop
+      if (outcome !== 'accepted') {
+        btnInstall.disabled = false; // canceló, permitir reintentar
+      }
+      // Si aceptó, 'appinstalled' se encarga del resto
       return;
     }
 
-    // Escritorio o Android sin prompt (raro: ya instalada o browser no compatible)
+    // iOS: toggle panel instrucciones
+    if (isIOS) {
+      iosPanel.style.display = iosPanel.style.display === 'block' ? 'none' : 'block';
+      return;
+    }
+
+    // Desktop/otro: toggle mensaje
     desktopPanel.style.display = desktopPanel.style.display === 'block' ? 'none' : 'block';
   });
 
-  // ── Instalación completada → mostrar pantalla de éxito ─────────────────────
-  // NO redirigir aquí: el usuario está en el browser, no en la app.
-  // La app instalada arranca sola en standalone y entra directo al login.
+  // ── App instalada exitosamente ────────────────────────────────────────────
   window.addEventListener('appinstalled', () => {
-    document.querySelector('.requirement-box').style.display = 'none';
-    btnInstall.style.display = 'none';
-    document.getElementById('success-panel').style.display = 'flex';
+    mostrarExito();
   });
 
-  // ── Lógica inicial según plataforma ─────────────────────────────────────────
+  // ── Lógica inicial por plataforma ─────────────────────────────────────────
   if (isIOS) {
-    // En iOS siempre mostramos el panel de instrucciones al tocar el botón
-    // Nada que hacer aquí antes del click
+    pedirNotificaciones();
+    // Mostrar panel de instrucciones directamente visible
+    iosPanel.style.display = 'block';
   } else if (!isMobile) {
-    // Escritorio: mostrar aviso directamente sin esperar el click
-    setTimeout(() => {
-      desktopPanel.style.display = 'block';
-    }, 400);
+    // Escritorio: mostrar aviso directo
+    setTimeout(() => { desktopPanel.style.display = 'block'; }, 300);
   }
-  // Android: el botón espera el deferredPrompt — funciona solo.
+  // Android: esperar beforeinstallprompt — el botón funciona solo
+
+  // ── Timeout: si en 3s Android no disparó el prompt, mostrar ayuda ─────────
+  if (isAndroid) {
+    setTimeout(() => {
+      if (!deferredPrompt) {
+        desktopPanel.style.display = 'block';
+        desktopPanel.innerHTML = '⚠️ Tu navegador no soporta instalación directa.<br><strong style="color:rgba(255,255,255,0.55)">Usa Chrome para Android.</strong>';
+      }
+    }, 3000);
+  }
 </script>
 
 <script>
